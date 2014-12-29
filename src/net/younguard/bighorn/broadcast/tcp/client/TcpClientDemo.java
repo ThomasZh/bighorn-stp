@@ -34,7 +34,7 @@ public class TcpClientDemo
 
 		connector.setHandler(new TcpClientEventHandler());
 
-		ConnectFuture connFuture = connector.connect(new InetSocketAddress(hostname, 13105));
+		ConnectFuture connFuture = connector.connect(new InetSocketAddress(hostname, port));
 		connFuture.awaitUninterruptibly();
 		session = connFuture.getSession();
 		logger.info("TCP client started.");
@@ -54,8 +54,11 @@ public class TcpClientDemo
 	public static void main(String[] args)
 			throws IOException, InterruptedException
 	{
-		String hostname = "localhost";
-		int port = 13105;
+		//String hostname = "localhost";
+		//String hostname = "54.186.197.254"; // aws
+		String hostname = "182.92.165.159"; // ali2
+		
+		int port = 13111;
 		if (args.length == 1)
 			hostname = args[0];
 		else if (args.length == 2) {

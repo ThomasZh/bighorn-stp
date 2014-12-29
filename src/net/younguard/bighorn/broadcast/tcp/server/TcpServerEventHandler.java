@@ -6,6 +6,7 @@ import java.net.SocketAddress;
 import net.younguard.bighorn.broadcast.cmd.BroadcastCommandParser;
 import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
+import net.younguard.bighorn.comm.tlv.TlvByteUtilPrinter;
 import net.younguard.bighorn.comm.tlv.TlvObject;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
@@ -35,11 +36,12 @@ public class TcpServerEventHandler
 			throws Exception
 	{
 		logger.debug("Session recv...");
+		
 		if (message != null && message instanceof TlvObject) {
 			long startTime = System.currentTimeMillis();
 
 			TlvObject pkg = (TlvObject) message;
-			// TlvByteUtilPrinter.hexDump("message body: ", pkg.getValue());
+			//TlvByteUtilPrinter.hexDump("message body: ", pkg.getValue());
 
 			RequestCommand reqCmd = null;
 			try {

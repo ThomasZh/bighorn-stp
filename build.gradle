@@ -17,7 +17,7 @@ apply from: 'tasks.gradle'
 
 group = 'bighorn-stp'
 version = project.distVersion
-mainClassName = "net.younguard.bighorn"
+mainClassName = "net.younguard.bighorn.broadcast.tcp.server.TcpServerDemo"
 
 
 processResources.dependsOn copyConfiguration

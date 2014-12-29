@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 public class TcpServerDemo
 {
-	private final static int PORT = 13105;
+	private final static int PORT = 13111;
 
 	public static void main(String[] args)
 			throws IOException
