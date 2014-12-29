@@ -1,0 +1,63 @@
+
+//--------- get parameter value from command line input 
+//--------- save a project level property for plug use
+loadConfiguration()
+
+def loadConfiguration() {
+    def environment = hasProperty('env') ? env : 'dev'
+    project.ext.set("environment", environment)
+    project.ext.set("distVersion", "0.1.0")//distribution version number
+}
+
+//----------------------------------
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin:'application'
+apply from: 'tasks.gradle'
+
+group = 'bighorn-stp'
+version = project.distVersion
+mainClassName = "net.younguard.bighorn"
+
+
+processResources.dependsOn copyConfiguration
+installApp.dependsOn modscript
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'bighorn stp', 'Implementation-Version': version
+    }
+
+    exclude '**/config.properties'   
+    exclude '**/jdbc.properties'   
+}
+
+repositories {
+   mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+        resources {
+            srcDir 'conf'
+        }
+    }
+     
+}
+
+
+dependencies {
+
+	compile project(':bighorn-comm')
+	
+	compile fileTree(dir: 'lib', include: '*.jar')
+    
+	compile 'junit:junit:4.11'
+
+    compile 'org.apache.mina:mina-core:2.0.7'    
+    
+}
+

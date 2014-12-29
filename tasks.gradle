@@ -1,0 +1,38 @@
+task copyConfiguration(type: Copy) {
+        println "Target environment: $environment"
+		 
+        from("vars/$environment")
+    	into('conf')
+    }
+    
+task modscript(dependsOn: startScripts) << {
+	def scriptFile = file "$startScripts.outputDir/$startScripts.applicationName"
+	
+	scriptFile.text = scriptFile.text.replace('CLASSPATH=$APP_HOME', 'CLASSPATH=.:$APP_HOME')
+	println ">>>replaced: " + scriptFile    
+}
+
+task deploy (dependsOn: installApp) << {
+	//def destination =  'build/install/'+project.name+'/bin'
+	def destination =  "build/install/$project.name/bin"
+	
+	copy {
+        from 'conf/config.properties'
+        into destination
+    }
+	println "copy config to: "+destination
+	
+}
+
+task pkg(type:Tar, dependsOn: deploy) {
+	version = project.distVersion
+	from "build/install/${project.name}"
+	
+	println relativePath(pkg.archivePath)
+	println "package..."
+}
+
+
+task getversion << {
+	println "version: "+project.distVersion
+}
