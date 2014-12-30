@@ -3,12 +3,15 @@ package net.younguard.bighorn.broadcast.tcp.client;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketAddress;
 
+import net.younguard.bighorn.broadcast.ErrorCode;
 import net.younguard.bighorn.broadcast.cmd.BroadcastCommandParser;
 import net.younguard.bighorn.broadcast.cmd.CommandTag;
 import net.younguard.bighorn.broadcast.cmd.MsgPangResp;
 import net.younguard.bighorn.broadcast.cmd.MsgPongResp;
+import net.younguard.bighorn.broadcast.cmd.QueryOnlineNumResp;
 import net.younguard.bighorn.comm.Command;
 import net.younguard.bighorn.comm.tlv.TlvObject;
+import net.younguard.bighorn.comm.util.LogErrorMessage;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
@@ -34,7 +37,9 @@ public class TcpClientEventHandler
 				// decode all the message to request command
 				respCmd = BroadcastCommandParser.decode(pkg);
 			} catch (UnsupportedEncodingException uee) {
-				logger.warn(uee.getMessage());
+				logger.warn("sessionId=[" + session.getId() + "]|commandTag=[" + pkg.getTag() + "]|ErrorCode=["
+						+ ErrorCode.ENCODING_FAILURE + "]|" + LogErrorMessage.getFullInfo(uee));
+
 				session.close(true);
 				return;// break the logic blow
 			}
@@ -50,6 +55,11 @@ public class TcpClientEventHandler
 				logger.info("pang response sequence=[" + pangRespCmd.getSequence() + "] state=["
 						+ pangRespCmd.getRespState() + "]");
 				break;
+			case CommandTag.QUERY_ONLINE_NUMBER_RESPONSE:
+				QueryOnlineNumResp qonRespCmd = (QueryOnlineNumResp) respCmd;
+				logger.info("query online number response sequence=[" + qonRespCmd.getSequence() + "] state=["
+						+ qonRespCmd.getRespState() + "] online number=[" + qonRespCmd.getNum() + "]");
+				break;
 			}
 		}// end of if
 	}
@@ -64,6 +74,8 @@ public class TcpClientEventHandler
 		SocketAddress rsa = session.getRemoteAddress();
 		// logger.error("remote address=" + rsa.toString() + " cause="
 		// + cause.getLocalizedMessage());
+		
+		session.close(true);
 	}
 
 	@Override

@@ -44,11 +44,13 @@ public class MsgPingAdapter
 			throws Exception
 	{
 		String txt = reqCmd.getContent();
+		
 		try {
 			IoService ioService = session.getService();
 			Map<Long, IoSession> sessions = ioService.getManagedSessions();
 
 			MsgPongResp pongRespCmd = new MsgPongResp(this.getSequence(), txt);
+			logger.info("user session=[" + session.getId() + "] message ping=[" + txt + "]");
 
 			// broadcast
 			for (Map.Entry<Long, IoSession> it : sessions.entrySet()) {
@@ -56,16 +58,17 @@ public class MsgPingAdapter
 				IoSession ioSession = it.getValue();
 
 				if (sessionId == session.getId()) {
-					logger.debug("This is sender's session=[" + sessionId + "]");
+					logger.debug("This is pinger's session=[" + sessionId + "]");
 					continue; // don't send me again.
 				}
 
 				TlvObject pongRespTlv = BroadcastCommandParser.encode(pongRespCmd);
 
 				ioSession.write(pongRespTlv);
-				logger.debug("broadcast message=[" + txt + "] to session=[" + sessionId + "].");
+				logger.info("broadcast message pong=[" + txt + "] to session=[" + sessionId + "]");
 			}
 
+			// message pang
 			MsgPangResp respCmd = new MsgPangResp(this.getSequence(), ErrorCode.SUCCESS);
 			return respCmd;
 		} catch (Exception e) {

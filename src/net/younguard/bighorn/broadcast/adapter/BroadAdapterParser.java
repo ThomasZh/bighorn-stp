@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import net.younguard.bighorn.broadcast.cmd.CommandTag;
 import net.younguard.bighorn.broadcast.cmd.MsgPangResp;
 import net.younguard.bighorn.broadcast.cmd.MsgPongResp;
+import net.younguard.bighorn.broadcast.cmd.QueryOnlineNumResp;
 import net.younguard.bighorn.comm.Command;
 import net.younguard.bighorn.comm.CommandParser;
 import net.younguard.bighorn.comm.tlv.TlvObject;
@@ -28,6 +29,10 @@ public class BroadAdapterParser
 			return new MsgPangResp().decode(tlv);
 		case CommandTag.MESSAGE_PONG_RESPONSE:
 			return new MsgPongResp().decode(tlv);
+		case CommandTag.QUERY_ONLINE_NUMBER_REQUEST:
+			return new QueryOnlineNumAdapter().decode(tlv);
+		case CommandTag.QUERY_ONLINE_NUMBER_RESPONSE:
+			return new QueryOnlineNumResp().decode(tlv);
 		default:
 			throw new UnsupportedEncodingException("Unknown command=[" + tlv.getTag() + "]");
 		}
