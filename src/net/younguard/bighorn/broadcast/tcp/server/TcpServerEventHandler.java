@@ -3,11 +3,12 @@ package net.younguard.bighorn.broadcast.tcp.server;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketAddress;
 
-import net.younguard.bighorn.broadcast.cmd.BroadcastCommandParser;
+import net.younguard.bighorn.broadcast.ErrorCode;
+import net.younguard.bighorn.broadcast.adapter.BroadAdapterParser;
 import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
-import net.younguard.bighorn.comm.tlv.TlvByteUtilPrinter;
 import net.younguard.bighorn.comm.tlv.TlvObject;
+import net.younguard.bighorn.comm.util.LogErrorMessage;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
@@ -36,27 +37,29 @@ public class TcpServerEventHandler
 			throws Exception
 	{
 		logger.debug("Session recv...");
-		
+
 		if (message != null && message instanceof TlvObject) {
 			long startTime = System.currentTimeMillis();
 
 			TlvObject pkg = (TlvObject) message;
-			//TlvByteUtilPrinter.hexDump("message body: ", pkg.getValue());
+			// TlvByteUtilPrinter.hexDump("message body: ", pkg.getValue());
 
 			RequestCommand reqCmd = null;
 			try {
 				// decode all the message to request command
-				reqCmd = (RequestCommand) BroadcastCommandParser.decode(pkg);
+				reqCmd = (RequestCommand) BroadAdapterParser.decode(pkg);
 			} catch (UnsupportedEncodingException uee) {
-				logger.warn(uee.getMessage());
+				logger.warn("sessionId=[" + session.getId() + "]|commandTag=[" + pkg.getTag() + "]|ErrorCode=["
+						+ ErrorCode.ENCODING_FAILURE + "]|" + LogErrorMessage.getFullInfo(uee));
+
 				session.close(true);
 				return;// break the logic blow
 			}
 
 			ResponseCommand respCmd = (ResponseCommand) reqCmd.execute(session);
 			if (respCmd != null) {
-				TlvObject tResp = BroadcastCommandParser.encode(respCmd);
-				session.write(tResp);
+				TlvObject respTlv = BroadAdapterParser.encode(respCmd);
+				session.write(respTlv);
 				logger.debug("send response command: " + respCmd.getTag());
 			}
 			long endTime = System.currentTimeMillis();
@@ -121,8 +124,7 @@ public class TcpServerEventHandler
 		cfg.setWriteTimeout(30);
 		cfg.setTcpNoDelay(false);
 		cfg.setKeepAlive(false);
-		// 设置了它后，MINA在调用了close()方法后，不会再进入TIME_WAIT状态了，而直接Close掉了，
-		// 这样就不会产生这样的那些TIME_WAIT的状态了。
+		// setup this, after mina call close(), netstat not too many TIME_WAIT
 		cfg.setSoLinger(0);
 
 		cfg.setTcpNoDelay(true);

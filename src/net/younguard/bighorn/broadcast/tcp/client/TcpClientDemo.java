@@ -5,9 +5,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 
 import net.younguard.bighorn.broadcast.cmd.BroadcastCommandParser;
-import net.younguard.bighorn.broadcast.cmd.SentMsgReq;
+import net.younguard.bighorn.broadcast.cmd.MsgPingReq;
 import net.younguard.bighorn.comm.codec.TlvPackageCodecFactory;
 import net.younguard.bighorn.comm.tlv.TlvObject;
+import net.younguard.bighorn.comm.util.DatetimeUtil;
 
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoConnector;
@@ -39,11 +40,12 @@ public class TcpClientDemo
 		session = connFuture.getSession();
 		logger.info("TCP client started.");
 
-		for (short i = 0;; i++) {
+		for (;;) {
+			int timestamp = DatetimeUtil.currentTimestamp();
 			Thread.sleep(1000); // 1s
 
-			String content = "[" + i + "]Hello, world!";
-			SentMsgReq reqCmd = new SentMsgReq(i, content);
+			String content = "[" + timestamp + "]Hello, world!";
+			MsgPingReq reqCmd = new MsgPingReq(timestamp, content);
 
 			TlvObject msgTlv = BroadcastCommandParser.encode(reqCmd);
 			session.write(msgTlv);
@@ -55,10 +57,10 @@ public class TcpClientDemo
 			throws IOException, InterruptedException
 	{
 		//String hostname = "localhost";
-		//String hostname = "54.186.197.254"; // aws
-		String hostname = "182.92.165.159"; // ali2
-		
-		int port = 13111;
+		String hostname = "54.186.197.254"; // aws
+		// String hostname = "182.92.165.159"; // ali2
+
+		int port = 13103;
 		if (args.length == 1)
 			hostname = args[0];
 		else if (args.length == 2) {

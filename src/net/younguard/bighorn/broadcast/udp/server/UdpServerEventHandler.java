@@ -3,10 +3,12 @@ package net.younguard.bighorn.broadcast.udp.server;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketAddress;
 
+import net.younguard.bighorn.broadcast.ErrorCode;
 import net.younguard.bighorn.broadcast.cmd.BroadcastCommandParser;
 import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
 import net.younguard.bighorn.comm.tlv.TlvObject;
+import net.younguard.bighorn.comm.util.LogErrorMessage;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
@@ -34,7 +36,9 @@ public class UdpServerEventHandler
 				// decode all the message to request command
 				reqCmd = (RequestCommand) BroadcastCommandParser.decode(pkg);
 			} catch (UnsupportedEncodingException uee) {
-				logger.warn(uee.getMessage());
+				logger.warn("sessionId=[" + session.getId() + "]|commandTag=[" + pkg.getTag() + "]|ErrorCode=["
+						+ ErrorCode.ENCODING_FAILURE + "]|" + LogErrorMessage.getFullInfo(uee));
+
 				session.close(true);
 				return;// break the logic blow
 			}

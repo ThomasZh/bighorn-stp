@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
+import net.younguard.bighorn.broadcast.util.PropArgs;
 import net.younguard.bighorn.comm.codec.TlvPackageCodecFactory;
 
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
@@ -18,18 +19,16 @@ import org.slf4j.LoggerFactory;
 
 public class UdpServerDemo
 {
-	private final static int PORT = 13105;
-
 	public static void main(String[] args)
 			throws IOException
 	{
-		logger.info("STP server is starting...");
+		logger.info("stp server is starting...");
 
-		startMinaServer();
-		logger.info("STP Server is listenig at port: " + PORT);
+		startMinaServer(PropArgs.STP_PORT);
+		logger.info("stp Server is listenig at port: " + PropArgs.STP_PORT);
 	}
 
-	private static void startMinaServer()
+	private static void startMinaServer(int port)
 			throws IOException
 	{
 		NioDatagramAcceptor acceptor = new NioDatagramAcceptor();
@@ -37,20 +36,20 @@ public class UdpServerDemo
 
 		// get a reference to the filter chain from the acceptor
 		DefaultIoFilterChainBuilder filterChainBuilder = acceptor.getFilterChain();
-		// 连接池设置
+		// setup thread pool
 		filterChainBuilder.addLast("threadPool", new ExecutorFilter(Executors.newCachedThreadPool()));
 		filterChainBuilder.addLast("logger", new LoggingFilter());
-		// 过滤器（自定义协议）
+		// filter (user define protocol tlv)
 		filterChainBuilder.addLast("codec", new ProtocolCodecFilter(new TlvPackageCodecFactory()));
 
-		// 设置数据将被读取的缓冲区大小
-		acceptor.getSessionConfig().setReadBufferSize(65535); // 64k
-		// 10s内没有读写就设置为空闲通道，并在eventHandler.sessionIdle中移除会话
+		// setup read buffer size
+		acceptor.getSessionConfig().setReadBufferSize(PropArgs.BUFFER_SIZE); // 64k
+		// 10 seconds idle, and remove eventHandler in sessionIdle
 		acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
 
 		DatagramSessionConfig dcfg = acceptor.getSessionConfig();
 		dcfg.setReuseAddress(true);
-		acceptor.bind(new InetSocketAddress(PORT));
+		acceptor.bind(new InetSocketAddress(port));
 	}
 
 	private final static Logger logger = LoggerFactory.getLogger(UdpServerDemo.class);

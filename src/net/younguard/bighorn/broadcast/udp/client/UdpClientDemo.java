@@ -4,9 +4,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 
 import net.younguard.bighorn.broadcast.cmd.BroadcastCommandParser;
-import net.younguard.bighorn.broadcast.cmd.SentMsgReq;
+import net.younguard.bighorn.broadcast.cmd.MsgPingReq;
 import net.younguard.bighorn.comm.codec.TlvPackageCodecFactory;
 import net.younguard.bighorn.comm.tlv.TlvObject;
+import net.younguard.bighorn.comm.util.DatetimeUtil;
 
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.future.ConnectFuture;
@@ -24,7 +25,7 @@ public class UdpClientDemo
 	DatagramConnector connector;
 	IoSession session;
 
-	public UdpClientDemo()
+	public UdpClientDemo(String hostname, int port)
 	{
 		logger.debug("UDPClient::UdpClientDemo");
 		logger.debug("Created a datagram connector");
@@ -38,7 +39,7 @@ public class UdpClientDemo
 		chain.addLast("codec", new ProtocolCodecFilter(new TlvPackageCodecFactory()));
 
 		logger.debug("About to connect to the server...");
-		ConnectFuture connFuture = connector.connect(new InetSocketAddress("127.0.0.1"/* "182.92.71.66" */, 13105));
+		ConnectFuture connFuture = connector.connect(new InetSocketAddress(hostname, port));
 
 		logger.debug("About to wait.");
 		connFuture.awaitUninterruptibly();
@@ -70,11 +71,12 @@ public class UdpClientDemo
 	private void sendData()
 			throws InterruptedException, UnsupportedEncodingException
 	{
-		for (short i = 0;; i++) {
+		for (;;) {
+			int timestamp = DatetimeUtil.currentTimestamp();
 			Thread.sleep(1000); // 1s
 
-			String content = "[" + i + "]Hello, world!";
-			SentMsgReq reqCmd = new SentMsgReq(i, content);
+			String content = "[" + timestamp + "]Hello, world!";
+			MsgPingReq reqCmd = new MsgPingReq(timestamp, content);
 
 			TlvObject msgTlv = BroadcastCommandParser.encode(reqCmd);
 			session.write(msgTlv);
@@ -84,7 +86,19 @@ public class UdpClientDemo
 
 	public static void main(String[] args)
 	{
-		new UdpClientDemo();
+		// String hostname = "localhost";
+		String hostname = "54.186.197.254"; // aws
+		// String hostname = "182.92.165.159"; // ali2
+
+		int port = 13101;
+		if (args.length == 1)
+			hostname = args[0];
+		else if (args.length == 2) {
+			hostname = args[0];
+			port = Integer.parseInt(args[1]);
+		}
+
+		new UdpClientDemo(hostname, port);
 	}
 
 	private final static Logger logger = LoggerFactory.getLogger(UdpClientDemo.class);

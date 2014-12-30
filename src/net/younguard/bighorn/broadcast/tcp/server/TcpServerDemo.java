@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
+import net.younguard.bighorn.broadcast.util.PropArgs;
 import net.younguard.bighorn.comm.codec.TlvPackageCodecFactory;
 
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
@@ -15,45 +16,39 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class TcpServerDemo
 {
-	private final static int PORT = 13111;
-
 	public static void main(String[] args)
 			throws IOException
 	{
-		logger.info("STP server is starting...");
+		logger.info("stp server is starting...");
 
-		startMinaServer();
-		logger.info("STP Server is listenig at port: " + PORT);
+		startMinaServer(PropArgs.STP_PORT);
+		logger.info("stp server is listenig at port: " + PropArgs.STP_PORT);
 
-		// start send heart bit for GateKeeper, every 1 second.
-		// new Thread(new HeartBitMonitor()).start();
-
-		logger.info("STP server start success!");
+		logger.info("stp server start success!");
 	}
 
-	private static void startMinaServer()
+	private static void startMinaServer(int port)
 			throws IOException
 	{
 		IoAcceptor acceptor = new NioSocketAcceptor();
 
-		// 杩�婊ゅ��锛����瀹�涔����璁�锛�
+		// filter (user define protocol tlv)
 		acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TlvPackageCodecFactory()));
-		// 璁剧疆��版��灏�琚�璇诲�����缂���插�哄ぇ灏�
-		acceptor.getSessionConfig().setReadBufferSize(65535); // 64k
-		// 8���������娌℃��璇诲��灏辫�剧疆涓虹┖��查�����锛�骞跺��eventHandler.sessionIdle涓�绉婚�や��璇�
+		// setup read buffer size
+		acceptor.getSessionConfig().setReadBufferSize(PropArgs.BUFFER_SIZE); // 64k
+		// 8 minutes idle, and remove eventHandler in sessionIdle
 		acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 480);
 
-		// 杩���ユ��璁剧疆
 		// get a reference to the filter chain from the acceptor
 		DefaultIoFilterChainBuilder filterChainBuilder = acceptor.getFilterChain();
+		// setup thread pool
 		filterChainBuilder.addLast("threadPool", new ExecutorFilter(Executors.newCachedThreadPool()));
 
 		// eventHandler to process message package
 		acceptor.setHandler(new TcpServerEventHandler());
-		acceptor.bind(new InetSocketAddress(PORT));
+		acceptor.bind(new InetSocketAddress(port));
 	}
 
 	private final static Logger logger = LoggerFactory.getLogger(TcpServerDemo.class);

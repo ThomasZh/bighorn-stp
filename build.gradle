@@ -6,7 +6,7 @@ loadConfiguration()
 def loadConfiguration() {
     def environment = hasProperty('env') ? env : 'dev'
     project.ext.set("environment", environment)
-    project.ext.set("distVersion", "0.1.0")//distribution version number
+    project.ext.set("distVersion", "0.2.0")//distribution version number
 }
 
 //----------------------------------

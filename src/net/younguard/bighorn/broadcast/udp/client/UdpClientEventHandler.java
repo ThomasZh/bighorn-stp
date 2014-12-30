@@ -5,8 +5,8 @@ import java.net.SocketAddress;
 
 import net.younguard.bighorn.broadcast.cmd.BroadcastCommandParser;
 import net.younguard.bighorn.broadcast.cmd.CommandTag;
-import net.younguard.bighorn.broadcast.cmd.SentMsgReq;
-import net.younguard.bighorn.broadcast.cmd.SentMsgResp;
+import net.younguard.bighorn.broadcast.cmd.MsgPangResp;
+import net.younguard.bighorn.broadcast.cmd.MsgPongResp;
 import net.younguard.bighorn.comm.Command;
 import net.younguard.bighorn.comm.tlv.TlvObject;
 
@@ -40,15 +40,15 @@ public class UdpClientEventHandler
 			}
 
 			switch (pkg.getTag()) {
-			case CommandTag.SENT_MESSAGE_REQUEST:
-				SentMsgReq sentReqCmd = (SentMsgReq) respCmd;
-				logger.info("receive message sequence=[" + sentReqCmd.getSequence() + "] content=["
-						+ sentReqCmd.getContent() + "]");
+			case CommandTag.MESSAGE_PONG_RESPONSE:
+				MsgPongResp pongRespCmd = (MsgPongResp) respCmd;
+				logger.info("pong response sequence=[" + pongRespCmd.getSequence() + "] content=["
+						+ pongRespCmd.getContent() + "]");
 				break;
-			case CommandTag.SENT_MESSAGE_RESPONSE:
-				SentMsgResp sentRespCmd = (SentMsgResp) respCmd;
-				logger.info("response sequence=[" + sentRespCmd.getSequence() + "] state=["
-						+ sentRespCmd.getRespState() + "]");
+			case CommandTag.MESSAGE_PANG_RESPONSE:
+				MsgPangResp pangRespCmd = (MsgPangResp) respCmd;
+				logger.info("pang response sequence=[" + pangRespCmd.getSequence() + "] state=["
+						+ pangRespCmd.getRespState() + "]");
 				break;
 			}
 		}// end of if
