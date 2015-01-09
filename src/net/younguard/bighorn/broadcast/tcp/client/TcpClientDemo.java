@@ -43,12 +43,13 @@ public class TcpClientDemo
 		session = connFuture.getSession();
 		logger.info("TCP client started.");
 
+		String username = "Tony";
 		for (int i = 0;; i++) {
 			int timestamp = DatetimeUtil.currentTimestamp();
 			Thread.sleep(1000); // 1s
 
 			String content = "[" + timestamp + "]Hello, world!";
-			MsgPingReq reqCmd = new MsgPingReq(timestamp, content);
+			MsgPingReq reqCmd = new MsgPingReq(timestamp, username, content);
 			TlvObject msgTlv = BroadcastCommandParser.encode(reqCmd);
 			WriteFuture future = session.write(msgTlv);
 			// Wait until the message is completely written out to the

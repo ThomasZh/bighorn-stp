@@ -43,13 +43,14 @@ public class MsgPingAdapter
 	public ResponseCommand execute(IoSession session)
 			throws Exception
 	{
+		String fromName = reqCmd.getUsername();
 		String txt = reqCmd.getContent();
-		
+
 		try {
 			IoService ioService = session.getService();
 			Map<Long, IoSession> sessions = ioService.getManagedSessions();
 
-			MsgPongResp pongRespCmd = new MsgPongResp(this.getSequence(), txt);
+			MsgPongResp pongRespCmd = new MsgPongResp(this.getSequence(), fromName, txt);
 			logger.info("user session=[" + session.getId() + "] message ping=[" + txt + "]");
 
 			// broadcast

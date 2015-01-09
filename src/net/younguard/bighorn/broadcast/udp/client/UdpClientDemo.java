@@ -71,12 +71,14 @@ public class UdpClientDemo
 	private void sendData()
 			throws InterruptedException, UnsupportedEncodingException
 	{
+		String username = "Tony";
+
 		for (;;) {
 			int timestamp = DatetimeUtil.currentTimestamp();
 			Thread.sleep(1000); // 1s
 
 			String content = "[" + timestamp + "]Hello, world!";
-			MsgPingReq reqCmd = new MsgPingReq(timestamp, content);
+			MsgPingReq reqCmd = new MsgPingReq(timestamp, username, content);
 
 			TlvObject msgTlv = BroadcastCommandParser.encode(reqCmd);
 			session.write(msgTlv);
