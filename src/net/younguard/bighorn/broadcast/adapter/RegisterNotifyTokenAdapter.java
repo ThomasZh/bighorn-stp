@@ -18,6 +18,17 @@ import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * after connect socket, client send first package for server. put device ID,notify token and username.
+ * 
+ * Copyright 2014-2015 by Young Guard Salon Community, China. All rights reserved.
+ * http://www.younguard.net
+ * 
+ * NOTICE ! You can copy or redistribute this code freely, but you should not
+ * remove the information about the copyright notice and the author.
+ * 
+ * @author ThomasZhang, thomas.zh@qq.com
+ */
 public class RegisterNotifyTokenAdapter
 		extends RequestCommand
 {

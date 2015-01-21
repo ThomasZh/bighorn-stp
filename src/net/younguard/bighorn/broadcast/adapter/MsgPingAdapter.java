@@ -26,12 +26,23 @@ import org.slf4j.LoggerFactory;
 
 import cn.jpush.api.JPushClient;
 
+/**
+ * sever received client message ping command.
+ * 
+ * Copyright 2014-2015 by Young Guard Salon Community, China. All rights
+ * reserved. http://www.younguard.net
+ * 
+ * NOTICE ! You can copy or redistribute this code freely, but you should not
+ * remove the information about the copyright notice and the author.
+ * 
+ * @author ThomasZhang, thomas.zh@qq.com
+ */
 public class MsgPingAdapter
 		extends RequestCommand
 {
 	protected static final String APP_KEY = "f681b6f304f146de15b918ae";
 	protected static final String MASTER_SECRET = "4e8f4e0561abf58b83f3f79f";
-	public static final String ALERT = "bighorn - alert";
+	public static final String ALERT = "bighorn";
 
 	public MsgPingAdapter()
 	{
@@ -71,6 +82,7 @@ public class MsgPingAdapter
 			for (Map.Entry<String, SessionObject> it : sessionMap.entrySet()) {
 				String deviceId = it.getKey();
 				SessionObject so = it.getValue();
+				String username = so.getUsername();
 
 				if (myDeviceId.equals(deviceId)) {
 					logger.debug("This is pinger's device=[" + deviceId + "]");
@@ -81,21 +93,38 @@ public class MsgPingAdapter
 						IoSession ioSession = sessions.get(sessionId);
 
 						if (ioSession != null) {
-							String username = so.getUsername();
 							TlvObject pongRespTlv = BroadcastCommandParser.encode(pongRespCmd);
 
 							ioSession.write(pongRespTlv);
 							logger.info("broadcast message pong=[" + txt + "] to user=[" + username + "] session=["
 									+ sessionId + "]");
 						} else { // offline
-							String MSG_CONTENT = fromName + ":" + txt;
-							JPushClient jpushClient = new JPushClient(MASTER_SECRET, APP_KEY);
-							jpushClient.sendAndroidMessageWithRegistrationID(ALERT, MSG_CONTENT, so.getNotifyToken());
+							if (so.getNotifyToken() != null && so.getNotifyToken().length() > 0) {
+								String MSG_CONTENT = fromName + ":" + txt;
+								JPushClient jpushClient = new JPushClient(MASTER_SECRET, APP_KEY);
+								jpushClient.sendAndroidNotificationWithRegistrationID(ALERT, MSG_CONTENT, null,
+										so.getNotifyToken());
+
+								logger.info("broadcast message pong=[" + txt + "] to user=[" + username
+										+ "] notify token=[" + so.getNotifyToken() + "] by jpush");
+							} else {
+								logger.warn("broadcast message pong=[" + txt + "] can't send to user=[" + username
+										+ "] by jpush, because has no notify token");
+							}
 						}
 					} else { // offline
-						String MSG_CONTENT = fromName + ":" + txt;
-						JPushClient jpushClient = new JPushClient(MASTER_SECRET, APP_KEY);
-						jpushClient.sendAndroidMessageWithRegistrationID(ALERT, MSG_CONTENT, so.getNotifyToken());
+						if (so.getNotifyToken() != null && so.getNotifyToken().length() > 0) {
+							String MSG_CONTENT = fromName + ":" + txt;
+							JPushClient jpushClient = new JPushClient(MASTER_SECRET, APP_KEY);
+							jpushClient.sendAndroidNotificationWithRegistrationID(ALERT, MSG_CONTENT, null,
+									so.getNotifyToken());
+
+							logger.info("broadcast message pong=[" + txt + "] to user=[" + username
+									+ "] notify token=[" + so.getNotifyToken() + "] by jpush");
+						} else {
+							logger.warn("broadcast message pong=[" + txt + "] can't send to user=[" + username
+									+ "] by jpush, because has no notify token");
+						}
 					}
 				}
 			}

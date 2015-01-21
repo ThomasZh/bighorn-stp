@@ -43,6 +43,12 @@
 		<appender-ref ref="ConsoleAppender" />
 	</logger>
 	
+	<logger name="cn.jpush.api">
+		<level value="DEBUG" />
+		<appender-ref ref="ConsoleAppender" />
+	</logger>
+	
+	
 	<logger name="org.springframework">
 		<level value="WARN" />
 		<appender-ref ref="ConsoleAppender" />

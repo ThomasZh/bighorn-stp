@@ -10,6 +10,17 @@ import net.younguard.bighorn.comm.util.LogErrorMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * read and write properties tools
+ * 
+ * Copyright 2014-2015 by Young Guard Salon Community, China. All rights
+ * reserved. http://www.younguard.net
+ * 
+ * NOTICE ! You can copy or redistribute this code freely, but you should not
+ * remove the information about the copyright notice and the author.
+ * 
+ * @author ThomasZhang, thomas.zh@qq.com
+ */
 public class PropUtil
 {
 	private static final Logger logger = LoggerFactory.getLogger(PropUtil.class);

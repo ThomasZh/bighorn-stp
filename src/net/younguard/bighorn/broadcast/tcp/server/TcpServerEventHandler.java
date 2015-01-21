@@ -21,16 +21,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * do 5 task on messageReceived:<br>
- * <br>
- * 1.monitor counting;<br>
- * 2.pkg decode to request command;<br>
- * 3.illegal request check;<br>
- * 4.setup command service;<br>
- * 5.do command execute;<br>
+ * TCP Server mina event handler. <br>
+ * 1.pkg decode to request command;<br>
+ * 2.illegal request check;<br>
+ * 3.do command execute;<br>
+ * 4.package command execute result to tlv;<br>
+ * 5.send tlv to client;<br>
  * 
- * @author liwenzhi
+ * Copyright 2014-2015 by Young Guard Salon Community, China. All rights
+ * reserved. http://www.younguard.net
  * 
+ * NOTICE ! You can copy or redistribute this code freely, but you should not
+ * remove the information about the copyright notice and the author.
+ * 
+ * @author ThomasZhang, thomas.zh@qq.com
  */
 public class TcpServerEventHandler
 		extends IoHandlerAdapter
@@ -102,7 +106,7 @@ public class TcpServerEventHandler
 		if (rsa != null) {
 			logger.info("sessionId=[" + session.getId() + "]|remote address=[" + rsa.toString() + "] disconnect.");
 		}
-		
+
 		SessionService sessionService = GenericSingleton.getInstance(SessionMap.class);
 		String myDeviceId = (String) session.getAttribute("deviceId");
 		sessionService.offline(myDeviceId);
