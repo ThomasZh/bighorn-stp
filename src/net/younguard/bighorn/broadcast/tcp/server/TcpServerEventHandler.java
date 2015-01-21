@@ -5,9 +5,12 @@ import java.net.SocketAddress;
 
 import net.younguard.bighorn.broadcast.ErrorCode;
 import net.younguard.bighorn.broadcast.adapter.BroadAdapterParser;
+import net.younguard.bighorn.broadcast.session.SessionMap;
+import net.younguard.bighorn.broadcast.session.SessionService;
 import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
 import net.younguard.bighorn.comm.tlv.TlvObject;
+import net.younguard.bighorn.comm.util.GenericSingleton;
 import net.younguard.bighorn.comm.util.LogErrorMessage;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
@@ -99,6 +102,10 @@ public class TcpServerEventHandler
 		if (rsa != null) {
 			logger.info("sessionId=[" + session.getId() + "]|remote address=[" + rsa.toString() + "] disconnect.");
 		}
+		
+		SessionService sessionService = GenericSingleton.getInstance(SessionMap.class);
+		String myDeviceId = (String) session.getAttribute("deviceId");
+		sessionService.offline(myDeviceId);
 	}
 
 	@Override

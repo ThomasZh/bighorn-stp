@@ -1,6 +1,7 @@
 package net.younguard.bighorn.broadcast.adapter;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.Map;
 
 import net.younguard.bighorn.broadcast.ErrorCode;
@@ -9,9 +10,13 @@ import net.younguard.bighorn.broadcast.cmd.CommandTag;
 import net.younguard.bighorn.broadcast.cmd.MsgPangResp;
 import net.younguard.bighorn.broadcast.cmd.MsgPingReq;
 import net.younguard.bighorn.broadcast.cmd.MsgPongResp;
+import net.younguard.bighorn.broadcast.session.SessionMap;
+import net.younguard.bighorn.broadcast.session.SessionObject;
+import net.younguard.bighorn.broadcast.session.SessionService;
 import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
 import net.younguard.bighorn.comm.tlv.TlvObject;
+import net.younguard.bighorn.comm.util.GenericSingleton;
 import net.younguard.bighorn.comm.util.LogErrorMessage;
 
 import org.apache.mina.core.service.IoService;
@@ -19,9 +24,15 @@ import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import cn.jpush.api.JPushClient;
+
 public class MsgPingAdapter
 		extends RequestCommand
 {
+	protected static final String APP_KEY = "f681b6f304f146de15b918ae";
+	protected static final String MASTER_SECRET = "4e8f4e0561abf58b83f3f79f";
+	public static final String ALERT = "bighorn - alert";
+
 	public MsgPingAdapter()
 	{
 		super();
@@ -49,25 +60,63 @@ public class MsgPingAdapter
 		try {
 			IoService ioService = session.getService();
 			Map<Long, IoSession> sessions = ioService.getManagedSessions();
+			String myDeviceId = (String) session.getAttribute("deviceId");
 
 			MsgPongResp pongRespCmd = new MsgPongResp(this.getSequence(), fromName, txt);
-			logger.info("user session=[" + session.getId() + "] message ping=[" + txt + "]");
+			logger.info("user=[" + fromName + "] session=[" + session.getId() + "] message ping=[" + txt + "]");
 
 			// broadcast
-			for (Map.Entry<Long, IoSession> it : sessions.entrySet()) {
-				long sessionId = it.getKey();
-				IoSession ioSession = it.getValue();
+			SessionService sessionService = GenericSingleton.getInstance(SessionMap.class);
+			HashMap<String, SessionObject> sessionMap = sessionService.getSessionMap();
+			for (Map.Entry<String, SessionObject> it : sessionMap.entrySet()) {
+				String deviceId = it.getKey();
+				SessionObject so = it.getValue();
 
-				if (sessionId == session.getId()) {
-					logger.debug("This is pinger's session=[" + sessionId + "]");
+				if (myDeviceId.equals(deviceId)) {
+					logger.debug("This is pinger's device=[" + deviceId + "]");
 					continue; // don't send me again.
+				} else {
+					if (so.isOnline()) {
+						long sessionId = so.getIoSessionId();
+						IoSession ioSession = sessions.get(sessionId);
+
+						if (ioSession != null) {
+							String username = so.getUsername();
+							TlvObject pongRespTlv = BroadcastCommandParser.encode(pongRespCmd);
+
+							ioSession.write(pongRespTlv);
+							logger.info("broadcast message pong=[" + txt + "] to user=[" + username + "] session=["
+									+ sessionId + "]");
+						} else { // offline
+							String MSG_CONTENT = fromName + ":" + txt;
+							JPushClient jpushClient = new JPushClient(MASTER_SECRET, APP_KEY);
+							jpushClient.sendAndroidMessageWithRegistrationID(ALERT, MSG_CONTENT, so.getNotifyToken());
+						}
+					} else { // offline
+						String MSG_CONTENT = fromName + ":" + txt;
+						JPushClient jpushClient = new JPushClient(MASTER_SECRET, APP_KEY);
+						jpushClient.sendAndroidMessageWithRegistrationID(ALERT, MSG_CONTENT, so.getNotifyToken());
+					}
 				}
-
-				TlvObject pongRespTlv = BroadcastCommandParser.encode(pongRespCmd);
-
-				ioSession.write(pongRespTlv);
-				logger.info("broadcast message pong=[" + txt + "] to session=[" + sessionId + "]");
 			}
+
+			// broadcast
+			// for (Map.Entry<Long, IoSession> it : sessions.entrySet()) {
+			// long sessionId = it.getKey();
+			// IoSession ioSession = it.getValue();
+			//
+			// if (sessionId == session.getId()) {
+			// logger.debug("This is pinger's session=[" + sessionId + "]");
+			// continue; // don't send me again.
+			// }
+			//
+			// TlvObject pongRespTlv =
+			// BroadcastCommandParser.encode(pongRespCmd);
+			//
+			// ioSession.write(pongRespTlv);
+			// logger.info("broadcast message pong=[" + txt + "] to session=[" +
+			// sessionId + "]");
+			// }
 
 			// message pang
 			MsgPangResp respCmd = new MsgPangResp(this.getSequence(), ErrorCode.SUCCESS);

@@ -1,15 +1,11 @@
 package net.younguard.bighorn.broadcast.adapter;
 
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Map;
 
 import net.younguard.bighorn.broadcast.ErrorCode;
 import net.younguard.bighorn.broadcast.cmd.CommandTag;
-import net.younguard.bighorn.broadcast.cmd.QueryOnlineNumReq;
-import net.younguard.bighorn.broadcast.cmd.QueryOnlineNumResp;
+import net.younguard.bighorn.broadcast.cmd.SocketCloseReq;
 import net.younguard.bighorn.broadcast.session.SessionMap;
-import net.younguard.bighorn.broadcast.session.SessionObject;
 import net.younguard.bighorn.broadcast.session.SessionService;
 import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
@@ -21,21 +17,21 @@ import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class QueryOnlineNumAdapter
+public class SocketCloseAdapter
 		extends RequestCommand
 {
-	public QueryOnlineNumAdapter()
+	public SocketCloseAdapter()
 	{
 		super();
 
-		this.setTag(CommandTag.QUERY_ONLINE_NUMBER_REQUEST);
+		this.setTag(CommandTag.SOCKET_CLOSE_REQUEST);
 	}
 
 	@Override
 	public RequestCommand decode(TlvObject tlv)
 			throws UnsupportedEncodingException
 	{
-		reqCmd = (QueryOnlineNumReq) new QueryOnlineNumReq().decode(tlv);
+		reqCmd = (SocketCloseReq) new SocketCloseReq().decode(tlv);
 		this.setSequence(reqCmd.getSequence());
 
 		return this;
@@ -46,35 +42,25 @@ public class QueryOnlineNumAdapter
 			throws Exception
 	{
 		try {
-			// IoService ioService = session.getService();
-			// Map<Long, IoSession> sessions = ioService.getManagedSessions();
+			String myDeviceId = (String) session.getAttribute("deviceId");
 
-			int num = 0;
 			SessionService sessionService = GenericSingleton.getInstance(SessionMap.class);
-			HashMap<String, SessionObject> sessionMap = sessionService.getSessionMap();
-			for (Map.Entry<String, SessionObject> it : sessionMap.entrySet()) {
-				SessionObject so = it.getValue();
+			sessionService.offline(myDeviceId);
 
-				if (so.isOnline())
-					num++;
-			}
+			logger.warn("sessionId=[" + session.getId() + "]|commandTag=[" + this.getTag() + "]|deviceId=["
+					+ myDeviceId + "]");
 
-			// int num = sessions.size();
-			logger.info("sessions number=[" + num + "] of this stp.");
-
-			QueryOnlineNumResp respCmd = new QueryOnlineNumResp(this.getSequence(), ErrorCode.SUCCESS, num);
-			return respCmd;
+			session.close(true);
 		} catch (Exception e) {
 			logger.warn("sessionId=[" + session.getId() + "]|commandTag=[" + this.getTag() + "]|ErrorCode=["
 					+ ErrorCode.UNKNOWN_FAILURE + "]|" + LogErrorMessage.getFullInfo(e));
-
-			QueryOnlineNumResp respCmd = new QueryOnlineNumResp(this.getSequence(), ErrorCode.UNKNOWN_FAILURE);
-			return respCmd;
 		}
+
+		return null;
 	}
 
-	private QueryOnlineNumReq reqCmd;
+	private SocketCloseReq reqCmd;
 
-	private final static Logger logger = LoggerFactory.getLogger(QueryOnlineNumAdapter.class);
+	private final static Logger logger = LoggerFactory.getLogger(SocketCloseAdapter.class);
 
 }
