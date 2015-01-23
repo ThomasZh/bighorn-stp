@@ -1,10 +1,11 @@
-package net.younguard.bighorn.broadcast.session;
+package net.younguard.bighorn.broadcast.domain;
 
 /**
- * store this object(deviceId,notifyToken,username,isOnline,minaIoSessionId) into session map.
+ * store this object(deviceId,notifyToken,username,isOnline,minaIoSessionId)
+ * into session map.
  * 
- * Copyright 2014-2015 by Young Guard Salon Community, China. All rights reserved.
- * http://www.younguard.net
+ * Copyright 2014-2015 by Young Guard Salon Community, China. All rights
+ * reserved. http://www.younguard.net
  * 
  * NOTICE ! You can copy or redistribute this code freely, but you should not
  * remove the information about the copyright notice and the author.
@@ -12,7 +13,13 @@ package net.younguard.bighorn.broadcast.session;
  * @author ThomasZhang, thomas.zh@qq.com
  */
 public class SessionObject
+		extends DeviceBaseInfo
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8733069412616001764L;
+
 	public SessionObject(String deviceId, String notifyToken, String username, boolean online, long ioSessionId)
 	{
 		this.setDeviceId(deviceId);
@@ -22,41 +29,8 @@ public class SessionObject
 		this.setIoSessionId(ioSessionId);
 	}
 
-	private String deviceId;
-	private String notifyToken;
-	private String username;
 	private boolean online;
 	private long ioSessionId;
-
-	public String getDeviceId()
-	{
-		return deviceId;
-	}
-
-	public void setDeviceId(String deviceId)
-	{
-		this.deviceId = deviceId;
-	}
-
-	public String getUsername()
-	{
-		return username;
-	}
-
-	public void setUsername(String username)
-	{
-		this.username = username;
-	}
-
-	public String getNotifyToken()
-	{
-		return notifyToken;
-	}
-
-	public void setNotifyToken(String notifyToken)
-	{
-		this.notifyToken = notifyToken;
-	}
 
 	public boolean isOnline()
 	{

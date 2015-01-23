@@ -10,13 +10,12 @@ import net.younguard.bighorn.broadcast.cmd.CommandTag;
 import net.younguard.bighorn.broadcast.cmd.MsgPangResp;
 import net.younguard.bighorn.broadcast.cmd.MsgPingReq;
 import net.younguard.bighorn.broadcast.cmd.MsgPongResp;
-import net.younguard.bighorn.broadcast.session.SessionMap;
-import net.younguard.bighorn.broadcast.session.SessionObject;
-import net.younguard.bighorn.broadcast.session.SessionService;
+import net.younguard.bighorn.broadcast.domain.SessionObject;
+import net.younguard.bighorn.broadcast.service.SessionService;
+import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
 import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
 import net.younguard.bighorn.comm.tlv.TlvObject;
-import net.younguard.bighorn.comm.util.GenericSingleton;
 import net.younguard.bighorn.comm.util.LogErrorMessage;
 
 import org.apache.mina.core.service.IoService;
@@ -67,24 +66,26 @@ public class MsgPingAdapter
 	{
 		String fromName = reqCmd.getUsername();
 		String txt = reqCmd.getContent();
+		String deviceId = (String) session.getAttribute("deviceId");
 
 		try {
+			SessionService sessionService = BighornApplicationContextUtil.getSessionService();
+			
 			IoService ioService = session.getService();
 			Map<Long, IoSession> sessions = ioService.getManagedSessions();
-			String myDeviceId = (String) session.getAttribute("deviceId");
 
+			logger.info("sessionId=[" + session.getId() + "]|device=[" + deviceId + "]|commandTag=[" + this.getTag()
+					+ "]|user=[" + fromName + "]|message=[" + txt + "]");
 			MsgPongResp pongRespCmd = new MsgPongResp(this.getSequence(), fromName, txt);
-			logger.info("user=[" + fromName + "] session=[" + session.getId() + "] message ping=[" + txt + "]");
 
 			// broadcast
-			SessionService sessionService = GenericSingleton.getInstance(SessionMap.class);
 			HashMap<String, SessionObject> sessionMap = sessionService.getSessionMap();
 			for (Map.Entry<String, SessionObject> it : sessionMap.entrySet()) {
-				String deviceId = it.getKey();
+				String onlineDeviceId = it.getKey();
 				SessionObject so = it.getValue();
 				String username = so.getUsername();
 
-				if (myDeviceId.equals(deviceId)) {
+				if (deviceId.equals(onlineDeviceId)) {
 					logger.debug("This is pinger's device=[" + deviceId + "]");
 					continue; // don't send me again.
 				} else {
@@ -129,30 +130,12 @@ public class MsgPingAdapter
 				}
 			}
 
-			// broadcast
-			// for (Map.Entry<Long, IoSession> it : sessions.entrySet()) {
-			// long sessionId = it.getKey();
-			// IoSession ioSession = it.getValue();
-			//
-			// if (sessionId == session.getId()) {
-			// logger.debug("This is pinger's session=[" + sessionId + "]");
-			// continue; // don't send me again.
-			// }
-			//
-			// TlvObject pongRespTlv =
-			// BroadcastCommandParser.encode(pongRespCmd);
-			//
-			// ioSession.write(pongRespTlv);
-			// logger.info("broadcast message pong=[" + txt + "] to session=[" +
-			// sessionId + "]");
-			// }
-
 			// message pang
 			MsgPangResp respCmd = new MsgPangResp(this.getSequence(), ErrorCode.SUCCESS);
 			return respCmd;
 		} catch (Exception e) {
-			logger.warn("sessionId=[" + session.getId() + "]|commandTag=[" + this.getTag() + "]|ErrorCode=["
-					+ ErrorCode.UNKNOWN_FAILURE + "]|" + LogErrorMessage.getFullInfo(e));
+			logger.warn("sessionId=[" + session.getId() + "]|device=[" + deviceId + "]commandTag=[" + this.getTag()
+					+ "]|ErrorCode=[" + ErrorCode.UNKNOWN_FAILURE + "]|" + LogErrorMessage.getFullInfo(e));
 
 			MsgPangResp respCmd = new MsgPangResp(this.getSequence(), ErrorCode.UNKNOWN_FAILURE);
 			return respCmd;

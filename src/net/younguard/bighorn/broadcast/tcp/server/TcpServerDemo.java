@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
+import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
 import net.younguard.bighorn.broadcast.util.PropArgs;
 import net.younguard.bighorn.comm.codec.TlvPackageCodecFactory;
 
@@ -15,12 +16,14 @@ import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * TCP Server entrance.
  * 
- * Copyright 2014-2015 by Young Guard Salon Community, China. All rights reserved.
- * http://www.younguard.net
+ * Copyright 2014-2015 by Young Guard Salon Community, China. All rights
+ * reserved. http://www.younguard.net
  * 
  * NOTICE ! You can copy or redistribute this code freely, but you should not
  * remove the information about the copyright notice and the author.
@@ -34,10 +37,21 @@ public class TcpServerDemo
 	{
 		logger.info("stp server is starting...");
 
+		initSpringApp();
+
 		startMinaServer(PropArgs.STP_PORT);
 		logger.info("stp server is listenig at port: " + PropArgs.STP_PORT);
 
 		logger.info("stp server start success!");
+	}
+
+	private static void initSpringApp()
+	{
+		String springXmlFile = "classpath:application-config.xml";
+		ApplicationContext applicationContext = new ClassPathXmlApplicationContext(springXmlFile);
+		BighornApplicationContextUtil.setApplicationContext(applicationContext);
+
+		logger.info("init ApplicationContext");
 	}
 
 	private static void startMinaServer(int port)

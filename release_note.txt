@@ -1,4 +1,9 @@
 ======================================================================
+bighorn-stp-0.5.0											2015.1.23
+new feature:
+	1.store device information into sqlite
+
+======================================================================
 bighorn-stp-0.4.0											2015.1.21
 new feature:
 	1.add jpush to notify message

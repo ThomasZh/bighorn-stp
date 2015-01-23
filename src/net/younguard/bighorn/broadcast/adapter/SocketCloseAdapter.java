@@ -5,12 +5,9 @@ import java.io.UnsupportedEncodingException;
 import net.younguard.bighorn.broadcast.ErrorCode;
 import net.younguard.bighorn.broadcast.cmd.CommandTag;
 import net.younguard.bighorn.broadcast.cmd.SocketCloseReq;
-import net.younguard.bighorn.broadcast.session.SessionMap;
-import net.younguard.bighorn.broadcast.session.SessionService;
 import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
 import net.younguard.bighorn.comm.tlv.TlvObject;
-import net.younguard.bighorn.comm.util.GenericSingleton;
 import net.younguard.bighorn.comm.util.LogErrorMessage;
 
 import org.apache.mina.core.session.IoSession;
@@ -20,8 +17,8 @@ import org.slf4j.LoggerFactory;
 /**
  * before disconnect socket, client send last package for server.
  * 
- * Copyright 2014-2015 by Young Guard Salon Community, China. All rights reserved.
- * http://www.younguard.net
+ * Copyright 2014-2015 by Young Guard Salon Community, China. All rights
+ * reserved. http://www.younguard.net
  * 
  * NOTICE ! You can copy or redistribute this code freely, but you should not
  * remove the information about the copyright notice and the author.
@@ -52,19 +49,15 @@ public class SocketCloseAdapter
 	public ResponseCommand execute(IoSession session)
 			throws Exception
 	{
+		String deviceId = (String) session.getAttribute("deviceId");
 		try {
-			String myDeviceId = (String) session.getAttribute("deviceId");
-
-			SessionService sessionService = GenericSingleton.getInstance(SessionMap.class);
-			sessionService.offline(myDeviceId);
-
-			logger.warn("sessionId=[" + session.getId() + "]|commandTag=[" + this.getTag() + "]|deviceId=["
-					+ myDeviceId + "]");
+			logger.info("sessionId=[" + session.getId() + "]|device=[" + deviceId + "]|commandTag=[" + this.getTag()
+					+ "]");
 
 			session.close(true);
 		} catch (Exception e) {
-			logger.warn("sessionId=[" + session.getId() + "]|commandTag=[" + this.getTag() + "]|ErrorCode=["
-					+ ErrorCode.UNKNOWN_FAILURE + "]|" + LogErrorMessage.getFullInfo(e));
+			logger.warn("sessionId=[" + session.getId() + "]|device=[" + deviceId + "]commandTag=[" + this.getTag()
+					+ "]|ErrorCode=[" + ErrorCode.UNKNOWN_FAILURE + "]|" + LogErrorMessage.getFullInfo(e));
 		}
 
 		return null;

@@ -5,8 +5,8 @@ import java.net.SocketAddress;
 
 import net.younguard.bighorn.broadcast.ErrorCode;
 import net.younguard.bighorn.broadcast.adapter.BroadAdapterParser;
-import net.younguard.bighorn.broadcast.session.SessionMap;
-import net.younguard.bighorn.broadcast.session.SessionService;
+import net.younguard.bighorn.broadcast.service.SessionService;
+import net.younguard.bighorn.broadcast.service.SessionServiceHashMapImpl;
 import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
 import net.younguard.bighorn.comm.tlv.TlvObject;
@@ -92,8 +92,10 @@ public class TcpServerEventHandler
 	{
 		super.exceptionCaught(session, cause);
 
-		// if (cause != null)
-		// logger.error(LogErrorMessage.getFullInfo(cause));
+		if (cause != null)
+			logger.error(LogErrorMessage.getFullInfo(cause));
+
+		super.sessionClosed(session);
 	}
 
 	@Override
@@ -102,14 +104,18 @@ public class TcpServerEventHandler
 	{
 		super.sessionClosed(session);
 
+		String myDeviceId = (String) session.getAttribute("deviceId");
+
 		SocketAddress rsa = session.getRemoteAddress();
 		if (rsa != null) {
-			logger.info("sessionId=[" + session.getId() + "]|remote address=[" + rsa.toString() + "] disconnect.");
+			logger.info("sessionId=[" + session.getId() + "]|device=[" + myDeviceId + "]|remote address=["
+					+ rsa.toString() + "] disconnect.");
 		}
 
-		SessionService sessionService = GenericSingleton.getInstance(SessionMap.class);
-		String myDeviceId = (String) session.getAttribute("deviceId");
+		SessionService sessionService = GenericSingleton.getInstance(SessionServiceHashMapImpl.class);
 		sessionService.offline(myDeviceId);
+		int num = sessionService.getOnlineNum();
+		logger.debug("sessions number=[" + num + "]");
 	}
 
 	@Override
