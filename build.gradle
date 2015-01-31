@@ -52,6 +52,7 @@ sourceSets {
 dependencies {
 
 	compile project(':bighorn-comm')
+	compile project(':bighorn-broadcast')
 	
 	compile fileTree(dir: 'lib', include: '*.jar')
     

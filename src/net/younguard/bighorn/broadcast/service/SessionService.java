@@ -17,9 +17,15 @@ import net.younguard.bighorn.broadcast.domain.SessionObject;
  */
 public interface SessionService
 {
-	public void online(String deviceId, String notifyToken, String username, long ioSessionId);
+	public void online(String deviceId, String notifyToken, String username, long ioSessionId, int timestamp);
+	
+	/**
+	 * load form database, then init memory cache.
+	 * those user's state is not online, and no ioSessionId in mina framework.
+	 */
+	public void init(String deviceId, String notifyToken, String username, int timestamp);
 
-	public void offline(String deviceId);
+	public void offline(String deviceId, int timestamp);
 
 	public boolean isOnline(String deviceId);
 

@@ -20,17 +20,20 @@ public class SessionObject
 	 */
 	private static final long serialVersionUID = -8733069412616001764L;
 
-	public SessionObject(String deviceId, String notifyToken, String username, boolean online, long ioSessionId)
+	public SessionObject(String deviceId, String notifyToken, String username, boolean online, long ioSessionId,
+			int timestamp)
 	{
 		this.setDeviceId(deviceId);
 		this.setNotifyToken(notifyToken);
 		this.setUsername(username);
 		this.setOnline(online);
 		this.setIoSessionId(ioSessionId);
+		this.setLastTrtTime(timestamp);
 	}
 
 	private boolean online;
 	private long ioSessionId;
+	private int lastTrtTime;
 
 	public boolean isOnline()
 	{
@@ -50,6 +53,16 @@ public class SessionObject
 	public void setIoSessionId(long ioSessionId)
 	{
 		this.ioSessionId = ioSessionId;
+	}
+
+	public int getLastTrtTime()
+	{
+		return lastTrtTime;
+	}
+
+	public void setLastTrtTime(int lastTrtTime)
+	{
+		this.lastTrtTime = lastTrtTime;
 	}
 
 }

@@ -1,6 +1,7 @@
 package net.younguard.bighorn.broadcast.adapter;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 import net.younguard.bighorn.broadcast.ErrorCode;
 import net.younguard.bighorn.broadcast.cmd.CommandTag;
@@ -13,6 +14,7 @@ import net.younguard.bighorn.comm.ResponseCommand;
 import net.younguard.bighorn.comm.tlv.TlvObject;
 import net.younguard.bighorn.comm.util.LogErrorMessage;
 
+import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,11 +57,16 @@ public class QueryOnlineNumAdapter
 		String deviceId = (String) session.getAttribute("deviceId");
 
 		try {
+			IoService ioService = session.getService();
+			Map<Long, IoSession> sessions = ioService.getManagedSessions();
+			int num = sessions.size();
+			logger.debug("mina io sessions number=[" + num + "]");
+
 			SessionService sessionService = BighornApplicationContextUtil.getSessionService();
-			int num = sessionService.getOnlineNum();
+			num = sessionService.getOnlineNum();
 
 			logger.info("sessionId=[" + session.getId() + "]|device=[" + deviceId + "]|commandTag=[" + this.getTag()
-					+ "]|sessions=[" + num + "]");
+					+ "]|session cache's online number=[" + num + "]");
 
 			QueryOnlineNumResp respCmd = new QueryOnlineNumResp(this.getSequence(), ErrorCode.SUCCESS, num);
 			return respCmd;

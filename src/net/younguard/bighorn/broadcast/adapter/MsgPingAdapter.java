@@ -16,6 +16,7 @@ import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
 import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
 import net.younguard.bighorn.comm.tlv.TlvObject;
+import net.younguard.bighorn.comm.util.DatetimeUtil;
 import net.younguard.bighorn.comm.util.LogErrorMessage;
 
 import org.apache.mina.core.service.IoService;
@@ -39,9 +40,10 @@ import cn.jpush.api.JPushClient;
 public class MsgPingAdapter
 		extends RequestCommand
 {
-	protected static final String APP_KEY = "f681b6f304f146de15b918ae";
-	protected static final String MASTER_SECRET = "4e8f4e0561abf58b83f3f79f";
-	public static final String ALERT = "bighorn";
+	private static final String APP_KEY = "f681b6f304f146de15b918ae";
+	private static final String MASTER_SECRET = "4e8f4e0561abf58b83f3f79f";
+	private static final String ALERT = "bighorn";
+	private static final int DAY1 = 86400; // 24h
 
 	public MsgPingAdapter()
 	{
@@ -67,18 +69,35 @@ public class MsgPingAdapter
 		String fromName = reqCmd.getUsername();
 		String txt = reqCmd.getContent();
 		String deviceId = (String) session.getAttribute("deviceId");
+		int timestamp = DatetimeUtil.currentTimestamp();
 
 		try {
-			SessionService sessionService = BighornApplicationContextUtil.getSessionService();
-			
+			logger.info("sessionId=[" + session.getId() + "]|device=[" + deviceId + "]|commandTag=[" + this.getTag()
+					+ "]|user=[" + fromName + "]|message=[" + txt + "]");
+
+			// message pang
+			MsgPangResp pangRespCmd = new MsgPangResp(this.getSequence(), ErrorCode.SUCCESS);
+			TlvObject pangRespTlv = BroadAdapterParser.encode(pangRespCmd);
+			session.write(pangRespTlv);
+		} catch (Exception e) {
+			logger.warn("sessionId=[" + session.getId() + "]|device=[" + deviceId + "]commandTag=[" + this.getTag()
+					+ "]|ErrorCode=[" + ErrorCode.UNKNOWN_FAILURE + "]|" + LogErrorMessage.getFullInfo(e));
+
+			MsgPangResp respCmd = new MsgPangResp(this.getSequence(), ErrorCode.UNKNOWN_FAILURE);
+			return respCmd;
+		}
+
+		try {
 			IoService ioService = session.getService();
 			Map<Long, IoSession> sessions = ioService.getManagedSessions();
 
-			logger.info("sessionId=[" + session.getId() + "]|device=[" + deviceId + "]|commandTag=[" + this.getTag()
-					+ "]|user=[" + fromName + "]|message=[" + txt + "]");
-			MsgPongResp pongRespCmd = new MsgPongResp(this.getSequence(), fromName, txt);
+			SessionService sessionService = BighornApplicationContextUtil.getSessionService();
+			JPushClient jpushClient = new JPushClient(MASTER_SECRET, APP_KEY);
+			String MSG_CONTENT = fromName + ":" + txt;
 
 			// broadcast
+			MsgPongResp pongRespCmd = new MsgPongResp(this.getSequence(), fromName, txt);
+
 			HashMap<String, SessionObject> sessionMap = sessionService.getSessionMap();
 			for (Map.Entry<String, SessionObject> it : sessionMap.entrySet()) {
 				String onlineDeviceId = it.getKey();
@@ -93,35 +112,24 @@ public class MsgPingAdapter
 						long sessionId = so.getIoSessionId();
 						IoSession ioSession = sessions.get(sessionId);
 
-						if (ioSession != null) {
-							TlvObject pongRespTlv = BroadcastCommandParser.encode(pongRespCmd);
+						TlvObject pongRespTlv = BroadcastCommandParser.encode(pongRespCmd);
 
-							ioSession.write(pongRespTlv);
-							logger.info("broadcast message pong=[" + txt + "] to user=[" + username + "] session=["
-									+ sessionId + "]");
-						} else { // offline
-							if (so.getNotifyToken() != null && so.getNotifyToken().length() > 0) {
-								String MSG_CONTENT = fromName + ":" + txt;
-								JPushClient jpushClient = new JPushClient(MASTER_SECRET, APP_KEY);
+						ioSession.write(pongRespTlv);
+						logger.info("broadcast message pong=[" + txt + "] to user=[" + username + "] session=["
+								+ sessionId + "]");
+					} else { // offline
+						if (so.getNotifyToken() != null && so.getNotifyToken().length() > 0) {
+							int lastTryTime = so.getLastTrtTime();
+							if (timestamp - lastTryTime > DAY1) { // 24h
+								logger.warn("broadcast message pong=[" + txt + "] can't send to user=[" + username
+										+ "] by jpush, because this user not online one day.");
+							} else {
 								jpushClient.sendAndroidNotificationWithRegistrationID(ALERT, MSG_CONTENT, null,
 										so.getNotifyToken());
 
 								logger.info("broadcast message pong=[" + txt + "] to user=[" + username
 										+ "] notify token=[" + so.getNotifyToken() + "] by jpush");
-							} else {
-								logger.warn("broadcast message pong=[" + txt + "] can't send to user=[" + username
-										+ "] by jpush, because has no notify token");
 							}
-						}
-					} else { // offline
-						if (so.getNotifyToken() != null && so.getNotifyToken().length() > 0) {
-							String MSG_CONTENT = fromName + ":" + txt;
-							JPushClient jpushClient = new JPushClient(MASTER_SECRET, APP_KEY);
-							jpushClient.sendAndroidNotificationWithRegistrationID(ALERT, MSG_CONTENT, null,
-									so.getNotifyToken());
-
-							logger.info("broadcast message pong=[" + txt + "] to user=[" + username
-									+ "] notify token=[" + so.getNotifyToken() + "] by jpush");
 						} else {
 							logger.warn("broadcast message pong=[" + txt + "] can't send to user=[" + username
 									+ "] by jpush, because has no notify token");
@@ -129,17 +137,12 @@ public class MsgPingAdapter
 					}
 				}
 			}
-
-			// message pang
-			MsgPangResp respCmd = new MsgPangResp(this.getSequence(), ErrorCode.SUCCESS);
-			return respCmd;
 		} catch (Exception e) {
 			logger.warn("sessionId=[" + session.getId() + "]|device=[" + deviceId + "]commandTag=[" + this.getTag()
 					+ "]|ErrorCode=[" + ErrorCode.UNKNOWN_FAILURE + "]|" + LogErrorMessage.getFullInfo(e));
-
-			MsgPangResp respCmd = new MsgPangResp(this.getSequence(), ErrorCode.UNKNOWN_FAILURE);
-			return respCmd;
 		}
+
+		return null;
 	}
 
 	private MsgPingReq reqCmd;

@@ -7,6 +7,9 @@ import java.util.Map;
 
 import net.younguard.bighorn.broadcast.domain.SessionObject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * use hashmap implements session service interface.
  * 
@@ -22,25 +25,38 @@ public class SessionServiceHashMapImpl
 		implements SessionService
 {
 	@Override
-	public void online(String deviceId, String notifyToken, String username, long ioSessionId)
+	public void online(String deviceId, String notifyToken, String username, long ioSessionId, int timestamp)
 	{
-		SessionObject so = new SessionObject(deviceId, notifyToken, username, true, ioSessionId);
-		deviceMap.put(deviceId, so);
+		if (deviceId != null) {
+			SessionObject so = new SessionObject(deviceId, notifyToken, username, true, ioSessionId, timestamp);
+			deviceMap.put(deviceId, so);
 
-		increase();
+			increase();
+		}
 	}
 
 	@Override
-	public void offline(String deviceId)
+	public void init(String deviceId, String notifyToken, String username, int timestamp)
 	{
-		SessionObject so = deviceMap.get(deviceId);
-		if (so != null) {
-			so.setOnline(false);
-			deviceMap.put(deviceId, so);
-		}
+		long ioSessionId = 0;// no session
 
-		if (deviceId != null)
+		SessionObject so = new SessionObject(deviceId, notifyToken, username, false, ioSessionId, timestamp);
+		deviceMap.put(deviceId, so);
+	}
+
+	@Override
+	public void offline(String deviceId, int timestamp)
+	{
+		if (deviceId != null) {
+			SessionObject so = deviceMap.get(deviceId);
+			if (so != null) {
+				so.setOnline(false);
+				so.setLastTrtTime(timestamp);
+				deviceMap.put(deviceId, so);
+			}
+
 			decrease();
+		}
 	}
 
 	@Override
@@ -84,16 +100,19 @@ public class SessionServiceHashMapImpl
 	@Override
 	public int getOnlineNum()
 	{
-		// int num = 0;
-		//
-		// for (Map.Entry<String, SessionObject> it : deviceMap.entrySet()) {
-		// SessionObject so = it.getValue();
-		//
-		// if (so.isOnline())
-		// num++;
-		// }
+		int i = 0;
 
-		return num;
+		for (Map.Entry<String, SessionObject> it : deviceMap.entrySet()) {
+			SessionObject so = it.getValue();
+
+			if (so.isOnline()) {
+				logger.debug(so.getUsername() + "," + so.getDeviceId() + "," + so.getNotifyToken() + ","
+						+ so.getIoSessionId());
+				i++;
+			}
+		}
+
+		return i;
 	}
 
 	// //////////////////////////////////////////////////////
@@ -112,5 +131,7 @@ public class SessionServiceHashMapImpl
 
 	private HashMap<String, SessionObject> deviceMap = new HashMap<String, SessionObject>();
 	private int num = 0;
+
+	private final static Logger logger = LoggerFactory.getLogger(SessionServiceHashMapImpl.class);
 
 }

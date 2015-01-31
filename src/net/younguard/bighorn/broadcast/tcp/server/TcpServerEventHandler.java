@@ -5,12 +5,13 @@ import java.net.SocketAddress;
 
 import net.younguard.bighorn.broadcast.ErrorCode;
 import net.younguard.bighorn.broadcast.adapter.BroadAdapterParser;
+import net.younguard.bighorn.broadcast.service.DeviceService;
 import net.younguard.bighorn.broadcast.service.SessionService;
-import net.younguard.bighorn.broadcast.service.SessionServiceHashMapImpl;
+import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
 import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
 import net.younguard.bighorn.comm.tlv.TlvObject;
-import net.younguard.bighorn.comm.util.GenericSingleton;
+import net.younguard.bighorn.comm.util.DatetimeUtil;
 import net.younguard.bighorn.comm.util.LogErrorMessage;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
@@ -104,18 +105,25 @@ public class TcpServerEventHandler
 	{
 		super.sessionClosed(session);
 
-		String myDeviceId = (String) session.getAttribute("deviceId");
+		String deviceId = (String) session.getAttribute("deviceId");
 
 		SocketAddress rsa = session.getRemoteAddress();
 		if (rsa != null) {
-			logger.info("sessionId=[" + session.getId() + "]|device=[" + myDeviceId + "]|remote address=["
+			logger.info("sessionId=[" + session.getId() + "]|device=[" + deviceId + "]|remote address=["
 					+ rsa.toString() + "] disconnect.");
 		}
 
-		SessionService sessionService = GenericSingleton.getInstance(SessionServiceHashMapImpl.class);
-		sessionService.offline(myDeviceId);
-		int num = sessionService.getOnlineNum();
-		logger.debug("sessions number=[" + num + "]");
+		if (deviceId != null) {
+			int timestamp = DatetimeUtil.currentTimestamp();
+			SessionService sessionService = BighornApplicationContextUtil.getSessionService();
+			DeviceService deviceService = BighornApplicationContextUtil.getDeviceService();
+
+			sessionService.offline(deviceId, timestamp);
+			deviceService.modifyLastUpdateTime(deviceId, timestamp);
+
+			int num = sessionService.getOnlineNum();
+			logger.debug("session cache's online number=[" + num + "]");
+		}
 	}
 
 	@Override

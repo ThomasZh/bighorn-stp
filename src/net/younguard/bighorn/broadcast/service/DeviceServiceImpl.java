@@ -1,6 +1,9 @@
 package net.younguard.bighorn.broadcast.service;
 
+import java.util.List;
+
 import net.younguard.bighorn.broadcast.dao.DeviceDao;
+import net.younguard.bighorn.broadcast.domain.DeviceDetailInfo;
 import net.younguard.bighorn.broadcast.domain.DeviceMasterInfo;
 
 public class DeviceServiceImpl
@@ -27,9 +30,21 @@ public class DeviceServiceImpl
 	}
 
 	@Override
+	public void modifyLastUpdateTime(String deviceId, int timestamp)
+	{
+		deviceDao.update(deviceId, timestamp);
+	}
+
+	@Override
 	public DeviceMasterInfo query(String deviceId)
 	{
 		return deviceDao.select(deviceId);
+	}
+
+	@Override
+	public List<DeviceDetailInfo> queryAll()
+	{
+		return deviceDao.selectAll();
 	}
 
 	@Override

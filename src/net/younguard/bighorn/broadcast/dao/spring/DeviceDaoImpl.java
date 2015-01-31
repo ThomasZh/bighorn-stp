@@ -3,8 +3,11 @@ package net.younguard.bighorn.broadcast.dao.spring;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.younguard.bighorn.broadcast.dao.DeviceDao;
+import net.younguard.bighorn.broadcast.domain.DeviceDetailInfo;
 import net.younguard.bighorn.broadcast.domain.DeviceMasterInfo;
 
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -63,6 +66,24 @@ public class DeviceDaoImpl
 	}
 
 	@Override
+	public void update(final String deviceId, final int timestamp)
+	{
+		String sql = "UPDATE user_device SET last_update_time=? WHERE device_id=?";
+		logger.debug("UPDATE user_device SET last_update_time=" + timestamp + " WHERE device_id=" + deviceId);
+
+		this.getJdbcTemplate().update(sql, new PreparedStatementSetter()
+		{
+			public void setValues(PreparedStatement ps)
+					throws SQLException
+			{
+				int i = 1;
+				ps.setInt(i++, timestamp);
+				ps.setString(i++, deviceId);
+			}
+		});
+	}
+
+	@Override
 	public DeviceMasterInfo select(final String deviceId)
 	{
 		final DeviceMasterInfo device = new DeviceMasterInfo();
@@ -91,6 +112,41 @@ public class DeviceDaoImpl
 		});
 
 		return device;
+	}
+
+	@Override
+	public List<DeviceDetailInfo> selectAll()
+	{
+		final List<DeviceDetailInfo> array = new ArrayList<DeviceDetailInfo>();
+
+		String sql = "SELECT device_id,username,notify_token,state,last_update_time FROM user_device";
+		logger.debug("SELECT device_id,username,notify_token,state,last_update_time FROM user_device");
+
+		this.getJdbcTemplate().query(sql, new PreparedStatementSetter()
+		{
+			public void setValues(PreparedStatement ps)
+					throws SQLException
+			{
+			}
+		}, new RowCallbackHandler()
+		{
+			public void processRow(ResultSet rs)
+					throws SQLException
+			{
+				DeviceDetailInfo device = new DeviceDetailInfo();
+
+				int i = 1;
+				device.setDeviceId(rs.getString(i++));
+				device.setUsername(rs.getString(i++));
+				device.setNotifyToken(rs.getString(i++));
+				device.setState(rs.getShort(i++));
+				device.setLastTryTime(rs.getInt(i++));
+
+				array.add(device);
+			}
+		});
+
+		return array;
 	}
 
 	@Override

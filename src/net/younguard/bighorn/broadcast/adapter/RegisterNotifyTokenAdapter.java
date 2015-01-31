@@ -74,7 +74,7 @@ public class RegisterNotifyTokenAdapter
 			logger.info("sessionId=[" + ioSessionId + "]|device=[" + deviceId + "]|commandTag=[" + this.getTag()
 					+ "]|user=[" + username + "]|notifyToken=[" + notifyToken + "]");
 
-			if (deviceId != null && deviceId.length() > 0) {
+			if (deviceId != null) {
 				session.setAttribute("deviceId", deviceId);
 
 				SessionObject so = sessionService.get(deviceId);
@@ -109,7 +109,8 @@ public class RegisterNotifyTokenAdapter
 						deviceService.modify(device, timestamp);
 					}
 				}
-				sessionService.online(deviceId, notifyToken, username, ioSessionId);
+				
+				sessionService.online(deviceId, notifyToken, username, ioSessionId, timestamp);
 			}
 
 			RegisterNotifyTokenResp respCmd = new RegisterNotifyTokenResp(this.getSequence(), ErrorCode.SUCCESS);

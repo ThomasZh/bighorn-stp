@@ -7,7 +7,6 @@ import net.younguard.bighorn.broadcast.cmd.MsgPangResp;
 import net.younguard.bighorn.broadcast.cmd.MsgPongResp;
 import net.younguard.bighorn.broadcast.cmd.QueryOnlineNumResp;
 import net.younguard.bighorn.broadcast.cmd.RegisterNotifyTokenResp;
-import net.younguard.bighorn.broadcast.cmd.SocketCloseReq;
 import net.younguard.bighorn.comm.Command;
 import net.younguard.bighorn.comm.CommandParser;
 import net.younguard.bighorn.comm.tlv.TlvObject;
@@ -15,8 +14,8 @@ import net.younguard.bighorn.comm.tlv.TlvObject;
 /**
  * command parser.
  * 
- * Copyright 2014-2015 by Young Guard Salon Community, China. All rights reserved.
- * http://www.younguard.net
+ * Copyright 2014-2015 by Young Guard Salon Community, China. All rights
+ * reserved. http://www.younguard.net
  * 
  * NOTICE ! You can copy or redistribute this code freely, but you should not
  * remove the information about the copyright notice and the author.
@@ -51,7 +50,7 @@ public class BroadAdapterParser
 		case CommandTag.REGISTER_NOTIFY_TOKEN_RESPONSE:
 			return new RegisterNotifyTokenResp().decode(tlv);
 		case CommandTag.SOCKET_CLOSE_REQUEST:
-			return new SocketCloseReq().decode(tlv);
+			return new SocketCloseAdapter().decode(tlv);
 		default:
 			throw new UnsupportedEncodingException("Unknown command=[" + tlv.getTag() + "]");
 		}

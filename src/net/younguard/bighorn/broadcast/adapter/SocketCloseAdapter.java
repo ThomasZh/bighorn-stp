@@ -1,6 +1,7 @@
 package net.younguard.bighorn.broadcast.adapter;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 import net.younguard.bighorn.broadcast.ErrorCode;
 import net.younguard.bighorn.broadcast.cmd.CommandTag;
@@ -10,6 +11,7 @@ import net.younguard.bighorn.comm.ResponseCommand;
 import net.younguard.bighorn.comm.tlv.TlvObject;
 import net.younguard.bighorn.comm.util.LogErrorMessage;
 
+import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,11 +52,17 @@ public class SocketCloseAdapter
 			throws Exception
 	{
 		String deviceId = (String) session.getAttribute("deviceId");
+
 		try {
+			IoService ioService = session.getService();
+			Map<Long, IoSession> sessions = ioService.getManagedSessions();
+			session.close(true);
+
+			int num = sessions.size();
+			logger.debug("mina io sessions number=[" + num + "]");
+
 			logger.info("sessionId=[" + session.getId() + "]|device=[" + deviceId + "]|commandTag=[" + this.getTag()
 					+ "]");
-
-			session.close(true);
 		} catch (Exception e) {
 			logger.warn("sessionId=[" + session.getId() + "]|device=[" + deviceId + "]commandTag=[" + this.getTag()
 					+ "]|ErrorCode=[" + ErrorCode.UNKNOWN_FAILURE + "]|" + LogErrorMessage.getFullInfo(e));

@@ -2,8 +2,12 @@ package net.younguard.bighorn.broadcast.tcp.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.concurrent.Executors;
 
+import net.younguard.bighorn.broadcast.domain.DeviceDetailInfo;
+import net.younguard.bighorn.broadcast.service.DeviceService;
+import net.younguard.bighorn.broadcast.service.SessionService;
 import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
 import net.younguard.bighorn.broadcast.util.PropArgs;
 import net.younguard.bighorn.comm.codec.TlvPackageCodecFactory;
@@ -39,6 +43,8 @@ public class TcpServerDemo
 
 		initSpringApp();
 
+		initSessionCache();
+
 		startMinaServer(PropArgs.STP_PORT);
 		logger.info("stp server is listenig at port: " + PropArgs.STP_PORT);
 
@@ -52,6 +58,20 @@ public class TcpServerDemo
 		BighornApplicationContextUtil.setApplicationContext(applicationContext);
 
 		logger.info("init ApplicationContext");
+	}
+
+	private static void initSessionCache()
+	{
+		SessionService sessionService = BighornApplicationContextUtil.getSessionService();
+		DeviceService deviceService = BighornApplicationContextUtil.getDeviceService();
+
+		List<DeviceDetailInfo> devices = deviceService.queryAll();
+		for (DeviceDetailInfo device : devices) {
+			sessionService.init(device.getDeviceId(), device.getNotifyToken(), device.getUsername(),
+					device.getLastTryTime());
+		}
+
+		logger.info("load all device info into session cache.");
 	}
 
 	private static void startMinaServer(int port)
