@@ -3,7 +3,7 @@ package net.younguard.bighorn.broadcast.tcp.server;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketAddress;
 
-import net.younguard.bighorn.broadcast.ErrorCode;
+import net.younguard.bighorn.ErrorCode;
 import net.younguard.bighorn.broadcast.adapter.BroadAdapterParser;
 import net.younguard.bighorn.broadcast.service.DeviceService;
 import net.younguard.bighorn.broadcast.service.SessionService;

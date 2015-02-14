@@ -1,5 +1,6 @@
 package net.younguard.bighorn.broadcast.util;
 
+import net.younguard.bighorn.broadcast.service.AccountService;
 import net.younguard.bighorn.broadcast.service.DeviceService;
 import net.younguard.bighorn.broadcast.service.SessionService;
 
@@ -29,6 +30,11 @@ public class BighornApplicationContextUtil
 	public static DeviceService getDeviceService()
 	{
 		return (DeviceService) context.getBean("broadcastDeviceService");
+	}
+
+	public static AccountService getAccountService()
+	{
+		return (AccountService) context.getBean("broadcastAccountService");
 	}
 
 }

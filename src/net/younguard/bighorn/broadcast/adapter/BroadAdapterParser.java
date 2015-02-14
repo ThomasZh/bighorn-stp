@@ -2,11 +2,11 @@ package net.younguard.bighorn.broadcast.adapter;
 
 import java.io.UnsupportedEncodingException;
 
-import net.younguard.bighorn.broadcast.cmd.CommandTag;
+import net.younguard.bighorn.CommandTag;
+import net.younguard.bighorn.account.cmd.RegisterDeviceNotifyTokenResp;
 import net.younguard.bighorn.broadcast.cmd.MsgPangResp;
-import net.younguard.bighorn.broadcast.cmd.MsgPongResp;
+import net.younguard.bighorn.broadcast.cmd.MsgPongNotify;
 import net.younguard.bighorn.broadcast.cmd.QueryOnlineNumResp;
-import net.younguard.bighorn.broadcast.cmd.RegisterNotifyTokenResp;
 import net.younguard.bighorn.comm.Command;
 import net.younguard.bighorn.comm.CommandParser;
 import net.younguard.bighorn.comm.tlv.TlvObject;
@@ -40,15 +40,15 @@ public class BroadAdapterParser
 		case CommandTag.MESSAGE_PANG_RESPONSE:
 			return new MsgPangResp().decode(tlv);
 		case CommandTag.MESSAGE_PONG_RESPONSE:
-			return new MsgPongResp().decode(tlv);
+			return new MsgPongNotify().decode(tlv);
 		case CommandTag.QUERY_ONLINE_NUMBER_REQUEST:
 			return new QueryOnlineNumAdapter().decode(tlv);
 		case CommandTag.QUERY_ONLINE_NUMBER_RESPONSE:
 			return new QueryOnlineNumResp().decode(tlv);
 		case CommandTag.REGISTER_NOTIFY_TOKEN_REQUEST:
-			return new RegisterNotifyTokenAdapter().decode(tlv);
+			return new RegisterDeviceNotifyTokenAdapter().decode(tlv);
 		case CommandTag.REGISTER_NOTIFY_TOKEN_RESPONSE:
-			return new RegisterNotifyTokenResp().decode(tlv);
+			return new RegisterDeviceNotifyTokenResp().decode(tlv);
 		case CommandTag.SOCKET_CLOSE_REQUEST:
 			return new SocketCloseAdapter().decode(tlv);
 		default:

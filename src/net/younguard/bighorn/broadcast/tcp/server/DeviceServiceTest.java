@@ -32,7 +32,7 @@ public class DeviceServiceTest
 {
 	private static String deviceId = UUID.randomUUID().toString();
 	private static String notifyToken = UUID.randomUUID().toString();
-	private static String username = "test";
+	private static String osVersion = "android-5.1.0";
 	private static final short DEVICE_STATE_ACTIVE = 100;
 	private static int timestamp = DatetimeUtil.currentTimestamp();
 
@@ -76,7 +76,7 @@ public class DeviceServiceTest
 	{
 		logger.info("Inside Add()");
 
-		DeviceMasterInfo device = new DeviceMasterInfo(deviceId, notifyToken, username, DEVICE_STATE_ACTIVE);
+		DeviceMasterInfo device = new DeviceMasterInfo(deviceId, notifyToken, osVersion, DEVICE_STATE_ACTIVE);
 		deviceService.create(device, timestamp);
 
 		logger.info("Finish Add()");
@@ -89,7 +89,7 @@ public class DeviceServiceTest
 
 		DeviceMasterInfo device = deviceService.query(deviceId);
 		assertEquals(notifyToken, device.getNotifyToken());
-		assertEquals(username, device.getUsername());
+		assertEquals(osVersion, device.getOsVersion());
 		assertEquals(DEVICE_STATE_ACTIVE, device.getState());
 
 		logger.info("Finish Query()");
@@ -100,8 +100,8 @@ public class DeviceServiceTest
 	{
 		logger.info("Inside Modify()");
 
-		username = "demo";
-		DeviceMasterInfo device = new DeviceMasterInfo(deviceId, notifyToken, username, DEVICE_STATE_ACTIVE);
+		osVersion = "iOS-8.0.2";
+		DeviceMasterInfo device = new DeviceMasterInfo(deviceId, notifyToken, osVersion, DEVICE_STATE_ACTIVE);
 		deviceService.modify(device, timestamp);
 
 		logger.info("Finish Modify()");
@@ -113,7 +113,7 @@ public class DeviceServiceTest
 		logger.info("Inside Query()");
 
 		DeviceMasterInfo device = deviceService.query(deviceId);
-		assertEquals(username, device.getUsername());
+		assertEquals(osVersion, device.getOsVersion());
 
 		logger.info("Finish Query()");
 	}

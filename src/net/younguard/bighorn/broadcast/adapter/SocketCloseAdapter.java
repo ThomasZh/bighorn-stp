@@ -3,13 +3,13 @@ package net.younguard.bighorn.broadcast.adapter;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
-import net.younguard.bighorn.broadcast.ErrorCode;
-import net.younguard.bighorn.broadcast.cmd.CommandTag;
-import net.younguard.bighorn.broadcast.cmd.SocketCloseReq;
+import net.younguard.bighorn.CommandTag;
+import net.younguard.bighorn.ErrorCode;
 import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
 import net.younguard.bighorn.comm.tlv.TlvObject;
 import net.younguard.bighorn.comm.util.LogErrorMessage;
+import net.younguard.bighorn.session.cmd.SocketCloseReq;
 
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.session.IoSession;

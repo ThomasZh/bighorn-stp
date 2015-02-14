@@ -13,11 +13,11 @@ public class DeviceMasterInfo
 	{
 	}
 
-	public DeviceMasterInfo(String deviceId, String notifyToken, String username, short state)
+	public DeviceMasterInfo(String deviceId, String notifyToken, String osVersion, short state)
 	{
 		this.setDeviceId(deviceId);
 		this.setNotifyToken(notifyToken);
-		this.setUsername(username);
+		this.setOsVersion(osVersion);
 		this.setState(state);
 	}
 

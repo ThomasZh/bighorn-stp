@@ -10,6 +10,8 @@ import net.younguard.bighorn.broadcast.dao.DeviceDao;
 import net.younguard.bighorn.broadcast.domain.DeviceDetailInfo;
 import net.younguard.bighorn.broadcast.domain.DeviceMasterInfo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
@@ -19,12 +21,23 @@ public class DeviceDaoImpl
 		implements DeviceDao
 {
 	@Override
-	public void add(final String deviceId, final String notifyToken, final String username, final short state,
+	public void add(final String deviceId, final String notifyToken, final String osVersion, final short state,
 			final int timestamp)
 	{
-		String sql = "INSERT INTO user_device (device_id,username,notify_token,state,create_time,last_update_time) VALUES (?,?,?,?,?,?)";
-		logger.debug("INSERT INTO user_device (device_id,username,notify_token,state,create_time,last_update_time) VALUES ("
-				+ deviceId + "," + username + "," + notifyToken + "," + state + "," + timestamp + "," + timestamp + ")");
+		String sql = "INSERT INTO bighorn_device (device_id,os_version,notify_token,state,create_time,last_update_time) VALUES (?,?,?,?,?,?)";
+		logger.debug("INSERT INTO bighorn_device (device_id,os_version,notify_token,state,create_time,last_update_time) VALUES ("
+				+ deviceId
+				+ ","
+				+ osVersion
+				+ ","
+				+ notifyToken
+				+ ","
+				+ state
+				+ ","
+				+ timestamp
+				+ ","
+				+ timestamp
+				+ ")");
 
 		this.getJdbcTemplate().update(sql, new PreparedStatementSetter()
 		{
@@ -33,7 +46,7 @@ public class DeviceDaoImpl
 			{
 				int i = 1;
 				ps.setString(i++, deviceId);
-				ps.setString(i++, username);
+				ps.setString(i++, osVersion);
 				ps.setString(i++, notifyToken);
 				ps.setShort(i++, state);
 				ps.setInt(i++, timestamp);
@@ -43,12 +56,12 @@ public class DeviceDaoImpl
 	}
 
 	@Override
-	public void update(final String deviceId, final String notifyToken, final String username, final short state,
+	public void update(final String deviceId, final String notifyToken, final String osVersion, final short state,
 			final int timestamp)
 	{
-		String sql = "UPDATE user_device SET username=?,notify_token=?,state=?,last_update_time=? WHERE device_id=?";
-		logger.debug("UPDATE user_device SET username=" + username + ",notify_token=" + notifyToken + ",state=" + state
-				+ ",last_update_time=" + timestamp + " WHERE device_id=" + deviceId);
+		String sql = "UPDATE bighorn_device SET os_version=?,notify_token=?,state=?,last_update_time=? WHERE device_id=?";
+		logger.debug("UPDATE bighorn_device SET os_version=" + osVersion + ",notify_token=" + notifyToken + ",state="
+				+ state + ",last_update_time=" + timestamp + " WHERE device_id=" + deviceId);
 
 		this.getJdbcTemplate().update(sql, new PreparedStatementSetter()
 		{
@@ -56,7 +69,7 @@ public class DeviceDaoImpl
 					throws SQLException
 			{
 				int i = 1;
-				ps.setString(i++, username);
+				ps.setString(i++, osVersion);
 				ps.setString(i++, notifyToken);
 				ps.setShort(i++, state);
 				ps.setInt(i++, timestamp);
@@ -68,8 +81,8 @@ public class DeviceDaoImpl
 	@Override
 	public void update(final String deviceId, final int timestamp)
 	{
-		String sql = "UPDATE user_device SET last_update_time=? WHERE device_id=?";
-		logger.debug("UPDATE user_device SET last_update_time=" + timestamp + " WHERE device_id=" + deviceId);
+		String sql = "UPDATE bighorn_device SET last_update_time=? WHERE device_id=?";
+		logger.debug("UPDATE bighorn_device SET last_update_time=" + timestamp + " WHERE device_id=" + deviceId);
 
 		this.getJdbcTemplate().update(sql, new PreparedStatementSetter()
 		{
@@ -88,8 +101,8 @@ public class DeviceDaoImpl
 	{
 		final DeviceMasterInfo device = new DeviceMasterInfo();
 
-		String sql = "SELECT username,notify_token,state FROM user_device WHERE device_id=?";
-		logger.debug("SELECT username,notify_token,state FROM user_device WHERE device_id=" + deviceId);
+		String sql = "SELECT os_version,notify_token,state FROM bighorn_device WHERE device_id=?";
+		logger.debug("SELECT os_version,notify_token,state FROM bighorn_device WHERE device_id=" + deviceId);
 
 		this.getJdbcTemplate().query(sql, new PreparedStatementSetter()
 		{
@@ -105,7 +118,7 @@ public class DeviceDaoImpl
 			{
 				int i = 1;
 				device.setDeviceId(deviceId);
-				device.setUsername(rs.getString(i++));
+				device.setOsVersion(rs.getString(i++));
 				device.setNotifyToken(rs.getString(i++));
 				device.setState(rs.getShort(i++));
 			}
@@ -119,8 +132,8 @@ public class DeviceDaoImpl
 	{
 		final List<DeviceDetailInfo> array = new ArrayList<DeviceDetailInfo>();
 
-		String sql = "SELECT device_id,username,notify_token,state,last_update_time FROM user_device";
-		logger.debug("SELECT device_id,username,notify_token,state,last_update_time FROM user_device");
+		String sql = "SELECT device_id,os_version,notify_token,state,last_update_time FROM bighorn_device";
+		logger.debug("SELECT device_id,os_version,notify_token,state,last_update_time FROM bighorn_device");
 
 		this.getJdbcTemplate().query(sql, new PreparedStatementSetter()
 		{
@@ -137,7 +150,7 @@ public class DeviceDaoImpl
 
 				int i = 1;
 				device.setDeviceId(rs.getString(i++));
-				device.setUsername(rs.getString(i++));
+				device.setOsVersion(rs.getString(i++));
 				device.setNotifyToken(rs.getString(i++));
 				device.setState(rs.getShort(i++));
 				device.setLastTryTime(rs.getInt(i++));
@@ -152,8 +165,8 @@ public class DeviceDaoImpl
 	@Override
 	public void delete(final String deviceId)
 	{
-		String sql = "DELETE FROM user_device WHERE device_id=?";
-		logger.debug("DELETE FROM user_device WHERE device_id=" + deviceId);
+		String sql = "DELETE FROM bighorn_device WHERE device_id=?";
+		logger.debug("DELETE FROM bighorn_device WHERE device_id=" + deviceId);
 
 		this.getJdbcTemplate().update(sql, new PreparedStatementSetter()
 		{
@@ -168,11 +181,12 @@ public class DeviceDaoImpl
 	@Override
 	public boolean isExist(String deviceId)
 	{
-		String sql = "SELECT count(device_id) FROM user_device WHERE device_id=?";
-		logger.debug("SELECT count(device_id) FROM user_device WHERE device_id=" + deviceId);
+		String sql = "SELECT count(device_id) FROM bighorn_device WHERE device_id=?";
+		logger.debug("SELECT count(device_id) FROM bighorn_device WHERE device_id=" + deviceId);
 
 		int count = this.getJdbcTemplate().queryForObject(sql, Integer.class);
 		return count > 0 ? true : false;
 	}
 
+	private final static Logger logger = LoggerFactory.getLogger(DeviceDaoImpl.class);
 }

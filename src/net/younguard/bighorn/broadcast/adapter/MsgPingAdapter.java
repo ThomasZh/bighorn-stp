@@ -4,13 +4,13 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.younguard.bighorn.broadcast.ErrorCode;
-import net.younguard.bighorn.broadcast.cmd.BroadcastCommandParser;
-import net.younguard.bighorn.broadcast.cmd.CommandTag;
+import net.younguard.bighorn.BroadcastCommandParser;
+import net.younguard.bighorn.CommandTag;
+import net.younguard.bighorn.ErrorCode;
 import net.younguard.bighorn.broadcast.cmd.MsgPangResp;
 import net.younguard.bighorn.broadcast.cmd.MsgPingReq;
-import net.younguard.bighorn.broadcast.cmd.MsgPongResp;
-import net.younguard.bighorn.broadcast.domain.SessionObject;
+import net.younguard.bighorn.broadcast.cmd.MsgPongNotify;
+import net.younguard.bighorn.broadcast.domain.SessionDeviceObject;
 import net.younguard.bighorn.broadcast.service.SessionService;
 import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
 import net.younguard.bighorn.comm.RequestCommand;
@@ -96,13 +96,13 @@ public class MsgPingAdapter
 			String MSG_CONTENT = fromName + ":" + txt;
 
 			// broadcast
-			MsgPongResp pongRespCmd = new MsgPongResp(this.getSequence(), fromName, txt);
+			MsgPongNotify pongRespCmd = new MsgPongNotify(this.getSequence(), fromName, txt);
 
-			HashMap<String, SessionObject> sessionMap = sessionService.getSessionMap();
-			for (Map.Entry<String, SessionObject> it : sessionMap.entrySet()) {
+			HashMap<String, SessionDeviceObject> sessionMap = sessionService.getSessionMap();
+			for (Map.Entry<String, SessionDeviceObject> it : sessionMap.entrySet()) {
 				String onlineDeviceId = it.getKey();
-				SessionObject so = it.getValue();
-				String username = so.getUsername();
+				SessionDeviceObject so = it.getValue();
+				String username = so.getOsVersion();
 
 				if (deviceId.equals(onlineDeviceId)) {
 					logger.debug("This is pinger's device=[" + deviceId + "]");
@@ -119,7 +119,7 @@ public class MsgPingAdapter
 								+ sessionId + "]");
 					} else { // offline
 						if (so.getNotifyToken() != null && so.getNotifyToken().length() > 0) {
-							int lastTryTime = so.getLastTrtTime();
+							int lastTryTime = so.getLastTryTime();
 							if (timestamp - lastTryTime > DAY1) { // 24h
 								logger.warn("broadcast message pong=[" + txt + "] can't send to user=[" + username
 										+ "] by jpush, because this user not online one day.");

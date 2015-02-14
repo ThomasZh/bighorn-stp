@@ -7,9 +7,9 @@ import net.younguard.bighorn.broadcast.domain.DeviceMasterInfo;
 
 public interface DeviceDao
 {
-	public void add(String deviceId, String notifyToken, String username, short state, int timestamp);
+	public void add(String deviceId, String notifyToken, String osVersion, short state, int timestamp);
 
-	public void update(String deviceId, String notifyToken, String username, short state, int timestamp);
+	public void update(String deviceId, String notifyToken, String osVersion, short state, int timestamp);
 
 	public void update(String deviceId, int timestamp);
 

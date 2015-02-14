@@ -3,11 +3,11 @@ package net.younguard.bighorn.broadcast.tcp.client;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketAddress;
 
-import net.younguard.bighorn.broadcast.ErrorCode;
-import net.younguard.bighorn.broadcast.cmd.BroadcastCommandParser;
-import net.younguard.bighorn.broadcast.cmd.CommandTag;
+import net.younguard.bighorn.BroadcastCommandParser;
+import net.younguard.bighorn.CommandTag;
+import net.younguard.bighorn.ErrorCode;
 import net.younguard.bighorn.broadcast.cmd.MsgPangResp;
-import net.younguard.bighorn.broadcast.cmd.MsgPongResp;
+import net.younguard.bighorn.broadcast.cmd.MsgPongNotify;
 import net.younguard.bighorn.broadcast.cmd.QueryOnlineNumResp;
 import net.younguard.bighorn.comm.Command;
 import net.younguard.bighorn.comm.tlv.TlvObject;
@@ -46,7 +46,7 @@ public class TcpClientEventHandler
 
 			switch (pkg.getTag()) {
 			case CommandTag.MESSAGE_PONG_RESPONSE:
-				MsgPongResp pongRespCmd = (MsgPongResp) respCmd;
+				MsgPongNotify pongRespCmd = (MsgPongNotify) respCmd;
 				logger.info("pong response sequence=[" + pongRespCmd.getSequence() + "] content=["
 						+ pongRespCmd.getContent() + "]");
 				break;

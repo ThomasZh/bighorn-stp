@@ -2,7 +2,8 @@ package net.younguard.bighorn.broadcast.service;
 
 import java.util.HashMap;
 
-import net.younguard.bighorn.broadcast.domain.SessionObject;
+import net.younguard.bighorn.broadcast.domain.SessionAccountObject;
+import net.younguard.bighorn.broadcast.domain.SessionDeviceObject;
 
 /**
  * session service interface.
@@ -17,23 +18,28 @@ import net.younguard.bighorn.broadcast.domain.SessionObject;
  */
 public interface SessionService
 {
-	public void online(String deviceId, String notifyToken, String username, long ioSessionId, int timestamp);
-	
-	/**
-	 * load form database, then init memory cache.
-	 * those user's state is not online, and no ioSessionId in mina framework.
-	 */
-	public void init(String deviceId, String notifyToken, String username, int timestamp);
+	public void online(String accountId, String deviceId, String osVersion, String notifyToken, long ioSessionId,
+			int timestamp);
+
+	public SessionDeviceObject getDevice(String deviceId);
 
 	public void offline(String deviceId, int timestamp);
 
+	public void register(String accountId, String deviceId, String nickname, String avatarUrl);
+
+	public SessionAccountObject getAccount(String accountId);
+
 	public boolean isOnline(String deviceId);
 
-	public HashMap<String, SessionObject> getSessionMap();
+	/**
+	 * load form database, then init memory cache. those user's state is not
+	 * online, and no ioSessionId in mina framework.
+	 */
+	public void init(String deviceId, String notifyToken, String username, int timestamp);
 
-	// public List<SessionObject> getOnlineSessions();
+	public HashMap<String, SessionDeviceObject> getSessionMap();
 
-	public SessionObject get(String deviceId);
+	// public List<SessionDeviceObject> getOnlineSessions();
 
 	public int getOnlineNum();
 }

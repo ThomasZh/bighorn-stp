@@ -10,7 +10,7 @@ public class DeviceBaseInfo
 	 */
 	private static final long serialVersionUID = -7899890500385186619L;
 	private String deviceId;
-	private String username;
+	private String osVersion;
 	private String notifyToken;
 
 	public String getDeviceId()
@@ -23,16 +23,6 @@ public class DeviceBaseInfo
 		this.deviceId = deviceId;
 	}
 
-	public String getUsername()
-	{
-		return username;
-	}
-
-	public void setUsername(String username)
-	{
-		this.username = username;
-	}
-
 	public String getNotifyToken()
 	{
 		return notifyToken;
@@ -41,6 +31,16 @@ public class DeviceBaseInfo
 	public void setNotifyToken(String notifyToken)
 	{
 		this.notifyToken = notifyToken;
+	}
+
+	public String getOsVersion()
+	{
+		return osVersion;
+	}
+
+	public void setOsVersion(String osVersion)
+	{
+		this.osVersion = osVersion;
 	}
 
 }

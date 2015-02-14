@@ -3,7 +3,7 @@ package net.younguard.bighorn.broadcast.udp.client;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 
-import net.younguard.bighorn.broadcast.cmd.BroadcastCommandParser;
+import net.younguard.bighorn.BroadcastCommandParser;
 import net.younguard.bighorn.broadcast.cmd.MsgPingReq;
 import net.younguard.bighorn.comm.codec.TlvPackageCodecFactory;
 import net.younguard.bighorn.comm.tlv.TlvObject;

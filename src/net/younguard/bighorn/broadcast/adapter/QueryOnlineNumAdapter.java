@@ -3,8 +3,8 @@ package net.younguard.bighorn.broadcast.adapter;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
-import net.younguard.bighorn.broadcast.ErrorCode;
-import net.younguard.bighorn.broadcast.cmd.CommandTag;
+import net.younguard.bighorn.CommandTag;
+import net.younguard.bighorn.ErrorCode;
 import net.younguard.bighorn.broadcast.cmd.QueryOnlineNumReq;
 import net.younguard.bighorn.broadcast.cmd.QueryOnlineNumResp;
 import net.younguard.bighorn.broadcast.service.SessionService;

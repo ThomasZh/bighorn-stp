@@ -67,7 +67,7 @@ public class TcpServerDemo
 
 		List<DeviceDetailInfo> devices = deviceService.queryAll();
 		for (DeviceDetailInfo device : devices) {
-			sessionService.init(device.getDeviceId(), device.getNotifyToken(), device.getUsername(),
+			sessionService.init(device.getDeviceId(), device.getNotifyToken(), device.getOsVersion(),
 					device.getLastTryTime());
 		}
 

@@ -20,4 +20,6 @@ public interface DeviceService
 	public List<DeviceDetailInfo> queryAll();
 
 	public void remove(String deviceId);
+
+	public void bind(String deviceId, String accountId, int timestamp);
 }
