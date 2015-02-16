@@ -2,6 +2,7 @@ package net.younguard.bighorn.broadcast.util;
 
 import net.younguard.bighorn.broadcast.service.AccountService;
 import net.younguard.bighorn.broadcast.service.DeviceService;
+import net.younguard.bighorn.broadcast.service.GameService;
 import net.younguard.bighorn.broadcast.service.SessionService;
 
 import org.springframework.beans.BeansException;
@@ -35,6 +36,11 @@ public class BighornApplicationContextUtil
 	public static AccountService getAccountService()
 	{
 		return (AccountService) context.getBean("broadcastAccountService");
+	}
+
+	public static GameService getGameService()
+	{
+		return (GameService) context.getBean("broadcastGameService");
 	}
 
 }

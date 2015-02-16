@@ -4,6 +4,10 @@ import java.io.UnsupportedEncodingException;
 
 import net.younguard.bighorn.CommandTag;
 import net.younguard.bighorn.account.cmd.RegisterDeviceNotifyTokenResp;
+import net.younguard.bighorn.broadcast.adapter.broadcast.MsgPingAdapter;
+import net.younguard.bighorn.broadcast.adapter.broadcast.QueryOnlineNumAdapter;
+import net.younguard.bighorn.broadcast.adapter.session.RegisterDeviceNotifyTokenAdapter;
+import net.younguard.bighorn.broadcast.adapter.session.SocketCloseAdapter;
 import net.younguard.bighorn.broadcast.cmd.MsgPangResp;
 import net.younguard.bighorn.broadcast.cmd.MsgPongNotify;
 import net.younguard.bighorn.broadcast.cmd.QueryOnlineNumResp;

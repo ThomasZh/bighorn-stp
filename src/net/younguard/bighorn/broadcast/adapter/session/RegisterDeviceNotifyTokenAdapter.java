@@ -1,4 +1,4 @@
-package net.younguard.bighorn.broadcast.adapter;
+package net.younguard.bighorn.broadcast.adapter.session;
 
 import java.io.UnsupportedEncodingException;
 

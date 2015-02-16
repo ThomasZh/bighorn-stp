@@ -1,4 +1,4 @@
-package net.younguard.bighorn.broadcast.adapter;
+package net.younguard.bighorn.broadcast.adapter.broadcast;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -7,6 +7,7 @@ import java.util.Map;
 import net.younguard.bighorn.BroadcastCommandParser;
 import net.younguard.bighorn.CommandTag;
 import net.younguard.bighorn.ErrorCode;
+import net.younguard.bighorn.broadcast.adapter.BroadAdapterParser;
 import net.younguard.bighorn.broadcast.cmd.MsgPangResp;
 import net.younguard.bighorn.broadcast.cmd.MsgPingReq;
 import net.younguard.bighorn.broadcast.cmd.MsgPongNotify;

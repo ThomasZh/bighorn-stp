@@ -1,15 +1,18 @@
-package net.younguard.bighorn.broadcast.adapter;
+package net.younguard.bighorn.broadcast.adapter.broadcast;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import net.younguard.bighorn.CommandTag;
 import net.younguard.bighorn.ErrorCode;
+import net.younguard.bighorn.broadcast.cmd.QueryOnlineNumReq;
+import net.younguard.bighorn.broadcast.cmd.QueryOnlineNumResp;
+import net.younguard.bighorn.broadcast.service.SessionService;
+import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
 import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
 import net.younguard.bighorn.comm.tlv.TlvObject;
 import net.younguard.bighorn.comm.util.LogErrorMessage;
-import net.younguard.bighorn.session.cmd.SocketCloseReq;
 
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.session.IoSession;
@@ -17,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * before disconnect socket, client send last package for server.
+ * sever received client query online device number command.
  * 
  * Copyright 2014-2015 by Young Guard Salon Community, China. All rights
  * reserved. http://www.younguard.net
@@ -27,21 +30,21 @@ import org.slf4j.LoggerFactory;
  * 
  * @author ThomasZhang, thomas.zh@qq.com
  */
-public class SocketCloseAdapter
+public class QueryOnlineNumAdapter
 		extends RequestCommand
 {
-	public SocketCloseAdapter()
+	public QueryOnlineNumAdapter()
 	{
 		super();
 
-		this.setTag(CommandTag.SOCKET_CLOSE_REQUEST);
+		this.setTag(CommandTag.QUERY_ONLINE_NUMBER_REQUEST);
 	}
 
 	@Override
 	public RequestCommand decode(TlvObject tlv)
 			throws UnsupportedEncodingException
 	{
-		reqCmd = (SocketCloseReq) new SocketCloseReq().decode(tlv);
+		reqCmd = (QueryOnlineNumReq) new QueryOnlineNumReq().decode(tlv);
 		this.setSequence(reqCmd.getSequence());
 
 		return this;
@@ -56,23 +59,28 @@ public class SocketCloseAdapter
 		try {
 			IoService ioService = session.getService();
 			Map<Long, IoSession> sessions = ioService.getManagedSessions();
-			session.close(true);
-
 			int num = sessions.size();
 			logger.debug("mina io sessions number=[" + num + "]");
 
+			SessionService sessionService = BighornApplicationContextUtil.getSessionService();
+			num = sessionService.getOnlineNum();
+
 			logger.info("sessionId=[" + session.getId() + "]|device=[" + deviceId + "]|commandTag=[" + this.getTag()
-					+ "]");
+					+ "]|session cache's online number=[" + num + "]");
+
+			QueryOnlineNumResp respCmd = new QueryOnlineNumResp(this.getSequence(), ErrorCode.SUCCESS, num);
+			return respCmd;
 		} catch (Exception e) {
 			logger.warn("sessionId=[" + session.getId() + "]|device=[" + deviceId + "]commandTag=[" + this.getTag()
 					+ "]|ErrorCode=[" + ErrorCode.UNKNOWN_FAILURE + "]|" + LogErrorMessage.getFullInfo(e));
-		}
 
-		return null;
+			QueryOnlineNumResp respCmd = new QueryOnlineNumResp(this.getSequence(), ErrorCode.UNKNOWN_FAILURE);
+			return respCmd;
+		}
 	}
 
-	private SocketCloseReq reqCmd;
+	private QueryOnlineNumReq reqCmd;
 
-	private final static Logger logger = LoggerFactory.getLogger(SocketCloseAdapter.class);
+	private final static Logger logger = LoggerFactory.getLogger(QueryOnlineNumAdapter.class);
 
 }
