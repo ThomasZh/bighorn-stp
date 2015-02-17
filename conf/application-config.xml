@@ -8,15 +8,45 @@
 
 
 	<!-- start of Dao beans -->
+	<bean id="broadcastAccountDao" class="net.younguard.bighorn.broadcast.dao.spring.AccountDaoImpl">
+		<property name="jdbcTemplate" ref="bighornJdbcTemplate" />
+	</bean>
 	<bean id="broadcastDeviceDao" class="net.younguard.bighorn.broadcast.dao.spring.DeviceDaoImpl">
+		<property name="jdbcTemplate" ref="bighornJdbcTemplate" />
+	</bean>
+	<bean id="broadcastDeviceAccountDao" class="net.younguard.bighorn.broadcast.dao.spring.DeviceAccountDaoImpl">
+		<property name="jdbcTemplate" ref="bighornJdbcTemplate" />
+	</bean>
+	<bean id="broadcastGameDao" class="net.younguard.bighorn.broadcast.dao.spring.GameDaoImpl">
+		<property name="jdbcTemplate" ref="bighornJdbcTemplate" />
+	</bean>
+	<bean id="broadcastGameManualDao" class="net.younguard.bighorn.broadcast.dao.spring.GameManualDaoImpl">
+		<property name="jdbcTemplate" ref="bighornJdbcTemplate" />
+	</bean>
+	<bean id="broadcastGameMemberDao" class="net.younguard.bighorn.broadcast.dao.spring.GameMemberDaoImpl">
+		<property name="jdbcTemplate" ref="bighornJdbcTemplate" />
+	</bean>
+	<bean id="broadcastPlayerDao" class="net.younguard.bighorn.broadcast.dao.spring.PlayerDaoImpl">
 		<property name="jdbcTemplate" ref="bighornJdbcTemplate" />
 	</bean>
 	<!-- end of Dao beans -->
 
 
 	<!-- start of service beans -->
+	<bean id="broadcastAccountService" class="net.younguard.bighorn.broadcast.service.AccountServiceImpl">
+		<property name="accountDao" ref="broadcastAccountDao" />
+	</bean>
 	<bean id="broadcastDeviceService" class="net.younguard.bighorn.broadcast.service.DeviceServiceImpl">
 		<property name="deviceDao" ref="broadcastDeviceDao" />
+		<property name="accountDeviceDao" ref="broadcastDeviceAccountDao" />
+	</bean>
+	<bean id="broadcastGameService" class="net.younguard.bighorn.broadcast.service.GameServiceImpl">
+		<property name="gameDao" ref="broadcastGameDao" />
+		<property name="gameMemberDao" ref="broadcastGameMemberDao" />
+		<property name="gameManualDao" ref="broadcastGameManualDao" />
+	</bean>
+	<bean id="broadcastPlayerService" class="net.younguard.bighorn.broadcast.service.PlayerServiceImpl">
+		<property name="playerDao" ref="broadcastPlayerDao" />
 	</bean>
 	<bean id="broadcastSessionService" class="net.younguard.bighorn.broadcast.service.SessionServiceHashMapImpl">
 	</bean>

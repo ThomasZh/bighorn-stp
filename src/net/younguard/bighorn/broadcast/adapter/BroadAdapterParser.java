@@ -3,14 +3,27 @@ package net.younguard.bighorn.broadcast.adapter;
 import java.io.UnsupportedEncodingException;
 
 import net.younguard.bighorn.CommandTag;
-import net.younguard.bighorn.account.cmd.RegisterDeviceNotifyTokenResp;
 import net.younguard.bighorn.broadcast.adapter.broadcast.MsgPingAdapter;
 import net.younguard.bighorn.broadcast.adapter.broadcast.QueryOnlineNumAdapter;
+import net.younguard.bighorn.broadcast.adapter.chess.GameHistoryQueryPaginationAdapter;
+import net.younguard.bighorn.broadcast.adapter.chess.GameInviteCreateAdapter;
+import net.younguard.bighorn.broadcast.adapter.chess.GameInviteQueryPaginationAdapter;
+import net.younguard.bighorn.broadcast.adapter.chess.GameJoinAdapter;
+import net.younguard.bighorn.broadcast.adapter.chess.GameLoadManualAdapter;
+import net.younguard.bighorn.broadcast.adapter.chess.GamePlayStepAdapter;
+import net.younguard.bighorn.broadcast.adapter.chess.GamePlayingQueryPaginationAdapter;
+import net.younguard.bighorn.broadcast.adapter.chess.GameResignAdapter;
+import net.younguard.bighorn.broadcast.adapter.chess.GameSyncStepAdapter;
+import net.younguard.bighorn.broadcast.adapter.chess.MyHistoryQueryPaginationAdapter;
+import net.younguard.bighorn.broadcast.adapter.chess.MyInviteQueryPaginationAdapter;
+import net.younguard.bighorn.broadcast.adapter.chess.MyPlayingQueryPaginationAdapter;
+import net.younguard.bighorn.broadcast.adapter.chess.PlayerHistoryQueryPaginationAdapter;
+import net.younguard.bighorn.broadcast.adapter.chess.PlayerInviteQueryPaginationAdapter;
+import net.younguard.bighorn.broadcast.adapter.chess.PlayerPlayingQueryPaginationAdapter;
+import net.younguard.bighorn.broadcast.adapter.session.AccountInfoModifyAdapter;
+import net.younguard.bighorn.broadcast.adapter.session.DeviceLoginAdapter;
 import net.younguard.bighorn.broadcast.adapter.session.RegisterDeviceNotifyTokenAdapter;
 import net.younguard.bighorn.broadcast.adapter.session.SocketCloseAdapter;
-import net.younguard.bighorn.broadcast.cmd.MsgPangResp;
-import net.younguard.bighorn.broadcast.cmd.MsgPongNotify;
-import net.younguard.bighorn.broadcast.cmd.QueryOnlineNumResp;
 import net.younguard.bighorn.comm.Command;
 import net.younguard.bighorn.comm.CommandParser;
 import net.younguard.bighorn.comm.tlv.TlvObject;
@@ -39,22 +52,51 @@ public class BroadAdapterParser
 			throws UnsupportedEncodingException
 	{
 		switch (tlv.getTag()) {
-		case CommandTag.MESSAGE_PING_REQUEST:
-			return new MsgPingAdapter().decode(tlv);
-		case CommandTag.MESSAGE_PANG_RESPONSE:
-			return new MsgPangResp().decode(tlv);
-		case CommandTag.MESSAGE_PONG_RESPONSE:
-			return new MsgPongNotify().decode(tlv);
-		case CommandTag.QUERY_ONLINE_NUMBER_REQUEST:
-			return new QueryOnlineNumAdapter().decode(tlv);
-		case CommandTag.QUERY_ONLINE_NUMBER_RESPONSE:
-			return new QueryOnlineNumResp().decode(tlv);
+		case CommandTag.ACCOUNT_INFO_MODIFY_REQUEST:
+			return new AccountInfoModifyAdapter().decode(tlv);
+		case CommandTag.DEVICE_LOGIN_REQUEST:
+			return new DeviceLoginAdapter().decode(tlv);
 		case CommandTag.REGISTER_NOTIFY_TOKEN_REQUEST:
 			return new RegisterDeviceNotifyTokenAdapter().decode(tlv);
-		case CommandTag.REGISTER_NOTIFY_TOKEN_RESPONSE:
-			return new RegisterDeviceNotifyTokenResp().decode(tlv);
 		case CommandTag.SOCKET_CLOSE_REQUEST:
 			return new SocketCloseAdapter().decode(tlv);
+
+		case CommandTag.GAME_HISTORY_QUERY_PAGINATION_REQUEST:
+			return new GameHistoryQueryPaginationAdapter().decode(tlv);
+		case CommandTag.GAME_INVITE_CREATE_REQUEST:
+			return new GameInviteCreateAdapter().decode(tlv);
+		case CommandTag.GAME_INVITE_QUERY_PAGINATION_REQUEST:
+			return new GameInviteQueryPaginationAdapter().decode(tlv);
+		case CommandTag.GAME_JOIN_REQUEST:
+			return new GameJoinAdapter().decode(tlv);
+		case CommandTag.GAME_LOAD_MANUAL_REQUEST:
+			return new GameLoadManualAdapter().decode(tlv);
+		case CommandTag.GAME_PLAYING_QUERY_PAGINATION_REQUEST:
+			return new GamePlayingQueryPaginationAdapter().decode(tlv);
+		case CommandTag.GAME_MY_HISTORY_QUERY_PAGINATION_REQUEST:
+			return new MyHistoryQueryPaginationAdapter().decode(tlv);
+		case CommandTag.GAME_MY_INVITE_QUERY_PAGINATION_REQUEST:
+			return new MyInviteQueryPaginationAdapter().decode(tlv);
+		case CommandTag.GAME_MY_PLAYING_QUERY_PAGINATION_REQUEST:
+			return new MyPlayingQueryPaginationAdapter().decode(tlv);
+		case CommandTag.GAME_PLAY_STEP_REQUEST:
+			return new GamePlayStepAdapter().decode(tlv);
+		case CommandTag.GAME_PLAYER_HISTORY_QUERY_PAGINATION_REQUEST:
+			return new PlayerHistoryQueryPaginationAdapter().decode(tlv);
+		case CommandTag.GAME_PLAYER_INVITE_QUERY_PAGINATION_REQUEST:
+			return new PlayerInviteQueryPaginationAdapter().decode(tlv);
+		case CommandTag.GAME_PLAYER_PLAYING_QUERY_PAGINATION_REQUEST:
+			return new PlayerPlayingQueryPaginationAdapter().decode(tlv);
+		case CommandTag.GAME_RESIGN_REQUEST:
+			return new GameResignAdapter().decode(tlv);
+		case CommandTag.GAME_SYNC_STEP_REQUEST:
+			return new GameSyncStepAdapter().decode(tlv);
+
+		case CommandTag.MESSAGE_PING_REQUEST:
+			return new MsgPingAdapter().decode(tlv);
+		case CommandTag.QUERY_ONLINE_NUMBER_REQUEST:
+			return new QueryOnlineNumAdapter().decode(tlv);
+
 		default:
 			throw new UnsupportedEncodingException("Unknown command=[" + tlv.getTag() + "]");
 		}

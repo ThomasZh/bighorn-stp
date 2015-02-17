@@ -1,4 +1,9 @@
 ======================================================================
+bighorn-stp-0.6.1											2015.2.17
+new feature:
+	1.recount player's summary
+	
+======================================================================
 bighorn-stp-0.6.0											2015.2.17
 new feature:
 	1.init all chess command interface

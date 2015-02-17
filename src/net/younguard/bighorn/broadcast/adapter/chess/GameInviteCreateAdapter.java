@@ -19,10 +19,10 @@ import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GameInviteCreateAdaper
+public class GameInviteCreateAdapter
 		extends RequestCommand
 {
-	public GameInviteCreateAdaper()
+	public GameInviteCreateAdapter()
 	{
 		super();
 
@@ -73,6 +73,6 @@ public class GameInviteCreateAdaper
 
 	private GameInviteCreateReq reqCmd;
 
-	private final static Logger logger = LoggerFactory.getLogger(GameInviteCreateAdaper.class);
+	private final static Logger logger = LoggerFactory.getLogger(GameInviteCreateAdapter.class);
 
 }

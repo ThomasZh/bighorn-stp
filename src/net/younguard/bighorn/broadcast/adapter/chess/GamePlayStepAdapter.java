@@ -12,7 +12,7 @@ import net.younguard.bighorn.broadcast.service.SessionService;
 import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
 import net.younguard.bighorn.chess.cmd.GamePlayStepReq;
 import net.younguard.bighorn.chess.cmd.GamePlayStepResp;
-import net.younguard.bighorn.chess.cmd.GameStepNotify;
+import net.younguard.bighorn.chess.cmd.GamePlayStepNotify;
 import net.younguard.bighorn.comm.CommandParser;
 import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
@@ -86,7 +86,7 @@ public class GamePlayStepAdapter
 				long opponentIoSessionId = opponentSdo.getIoSessionId();
 				IoSession opponentIoSession = sessions.get(opponentIoSessionId);
 
-				GameStepNotify notifyResp = new GameStepNotify(timestamp, gameId, accountId, color, step, x, y);
+				GamePlayStepNotify notifyResp = new GamePlayStepNotify(timestamp, gameId, accountId, color, step, x, y);
 				TlvObject tlvNotify = CommandParser.encode(notifyResp);
 				opponentIoSession.write(tlvNotify);
 			} else { // offline
