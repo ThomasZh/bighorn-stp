@@ -9,6 +9,7 @@ import net.younguard.bighorn.broadcast.dao.GameManualDao;
 import net.younguard.bighorn.broadcast.dao.PlayerDao;
 import net.younguard.bighorn.broadcast.domain.Page;
 import net.younguard.bighorn.domain.GameMasterInfo;
+import net.younguard.bighorn.domain.GameMemberMasterInfo;
 import net.younguard.bighorn.domain.GameStep;
 import net.younguard.bighorn.domain.PlayerSummary;
 
@@ -88,6 +89,12 @@ public class GameServiceImpl
 	}
 
 	@Override
+	public List<GameMemberMasterInfo> queryGameMembers(String gameId)
+	{
+		return playerDao.selectGameMembers(gameId);
+	}
+
+	@Override
 	public String create(String playerId, short color, short timeRule, int timestamp)
 	{
 		String gameId = UUID.randomUUID().toString();
@@ -121,9 +128,9 @@ public class GameServiceImpl
 	@Override
 	public String queryOpponentId(String gameId, String playerId)
 	{
-		List<PlayerSummary> array = playerDao.selectPlayers(gameId);
+		List<GameMemberMasterInfo> array = playerDao.selectGameMembers(gameId);
 
-		for (PlayerSummary player : array) {
+		for (GameMemberMasterInfo player : array) {
 			if (!playerId.equals(player.getAccountId())) {
 				return player.getAccountId();
 			}

@@ -3,7 +3,7 @@ package net.younguard.bighorn.broadcast.service;
 import java.util.UUID;
 
 import net.younguard.bighorn.broadcast.dao.AccountDao;
-import net.younguard.bighorn.broadcast.domain.AccountBaseInfo;
+import net.younguard.bighorn.domain.AccountBaseInfo;
 
 public class AccountServiceImpl
 		implements AccountService

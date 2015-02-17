@@ -1,4 +1,9 @@
 ======================================================================
+bighorn-stp-0.6.0											2015.2.17
+new feature:
+	1.init all chess command interface
+	
+======================================================================
 bighorn-stp-0.5.0											2015.1.23
 new feature:
 	1.store device information into sqlite

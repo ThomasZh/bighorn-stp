@@ -10,6 +10,7 @@ import net.younguard.bighorn.GlobalArgs;
 import net.younguard.bighorn.broadcast.dao.PlayerDao;
 import net.younguard.bighorn.broadcast.domain.Page;
 import net.younguard.bighorn.broadcast.util.PaginationHelper;
+import net.younguard.bighorn.domain.GameMemberMasterInfo;
 import net.younguard.bighorn.domain.PlayerSummary;
 
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ public class PlayerDaoImpl
 				+ ","
 				+ playerId
 				+ ","
-				+ GlobalArgs.PLAYER_STATE_PLAYING
+				+ GlobalArgs.GAME_MEMBER_STATE_PLAYING
 				+ ","
 				+ color
 				+ ","
@@ -48,7 +49,7 @@ public class PlayerDaoImpl
 				int i = 1;
 				ps.setString(i++, gameId);
 				ps.setString(i++, playerId);
-				ps.setShort(i++, GlobalArgs.PLAYER_STATE_PLAYING);
+				ps.setShort(i++, GlobalArgs.GAME_MEMBER_STATE_PLAYING);
 				ps.setShort(i++, color);
 				ps.setInt(i++, timestamp);
 				ps.setInt(i++, timestamp);
@@ -79,7 +80,7 @@ public class PlayerDaoImpl
 						data.setAccountId(rs.getString(n++));
 						data.setInviteNum(rs.getShort(n++));
 						data.setPlayingNum(rs.getShort(n++));
-						data.setPlayedNum(rs.getShort(n++));
+						data.setCompletedNum(rs.getShort(n++));
 
 						return data;
 					}
@@ -111,7 +112,7 @@ public class PlayerDaoImpl
 				data.setAccountId(accountId);
 				data.setInviteNum(rs.getShort(n++));
 				data.setPlayingNum(rs.getShort(n++));
-				data.setPlayedNum(rs.getShort(n++));
+				data.setCompletedNum(rs.getShort(n++));
 			}
 		});
 
@@ -119,13 +120,12 @@ public class PlayerDaoImpl
 	}
 
 	@Override
-	public List<PlayerSummary> selectPlayers(final String gameId)
+	public List<GameMemberMasterInfo> selectGameMembers(final String gameId)
 	{
-		final List<PlayerSummary> array = new ArrayList<PlayerSummary>();
+		final List<GameMemberMasterInfo> array = new ArrayList<GameMemberMasterInfo>();
 
-		String sql = "SELECT player_id,invite_num,playing_num,played_num FROM bighorn_game_player WHERE player_id=?";
-		logger.debug("SELECT player_id,invite_num,playing_num,played_num FROM bighorn_game_player WHERE player_id="
-				+ gameId);
+		String sql = "SELECT player_id,state FROM bighorn_game_player WHERE game_id=?";
+		logger.debug("SELECT player_id,state FROM bighorn_game_player WHERE game_id=" + gameId);
 
 		this.getJdbcTemplate().query(sql, new PreparedStatementSetter()
 		{
@@ -139,13 +139,11 @@ public class PlayerDaoImpl
 			public void processRow(ResultSet rs)
 					throws SQLException
 			{
-				PlayerSummary data = new PlayerSummary();
+				GameMemberMasterInfo data = new GameMemberMasterInfo();
 
 				int n = 1;
 				data.setAccountId(gameId);
-				data.setInviteNum(rs.getShort(n++));
-				data.setPlayingNum(rs.getShort(n++));
-				data.setPlayedNum(rs.getShort(n++));
+				data.setState(rs.getShort(n++));
 
 				array.add(data);
 			}

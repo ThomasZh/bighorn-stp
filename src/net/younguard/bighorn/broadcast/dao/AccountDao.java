@@ -1,6 +1,6 @@
 package net.younguard.bighorn.broadcast.dao;
 
-import net.younguard.bighorn.broadcast.domain.AccountBaseInfo;
+import net.younguard.bighorn.domain.AccountBaseInfo;
 
 public interface AccountDao
 {

@@ -3,6 +3,7 @@ package net.younguard.bighorn.broadcast.dao;
 import java.util.List;
 
 import net.younguard.bighorn.broadcast.domain.Page;
+import net.younguard.bighorn.domain.GameMemberMasterInfo;
 import net.younguard.bighorn.domain.PlayerSummary;
 
 public interface PlayerDao
@@ -11,7 +12,7 @@ public interface PlayerDao
 
 	public PlayerSummary select(String playerId);
 
-	public List<PlayerSummary> selectPlayers(String gameId);
+	public List<GameMemberMasterInfo> selectGameMembers(String gameId);
 	
 	public void add(String gameId, String playerId, short color, int timestamp);
 }

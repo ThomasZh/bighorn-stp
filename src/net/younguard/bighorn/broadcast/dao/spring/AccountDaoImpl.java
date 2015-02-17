@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 import net.younguard.bighorn.GlobalArgs;
 import net.younguard.bighorn.broadcast.dao.AccountDao;
-import net.younguard.bighorn.broadcast.domain.AccountBaseInfo;
+import net.younguard.bighorn.domain.AccountBaseInfo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

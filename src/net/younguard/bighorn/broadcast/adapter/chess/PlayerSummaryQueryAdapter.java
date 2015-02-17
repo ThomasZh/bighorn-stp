@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 
 import net.younguard.bighorn.CommandTag;
 import net.younguard.bighorn.ErrorCode;
+import net.younguard.bighorn.broadcast.service.AccountService;
 import net.younguard.bighorn.broadcast.service.GameService;
 import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
 import net.younguard.bighorn.chess.cmd.PlayerSummaryQueryReq;
@@ -12,6 +13,7 @@ import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
 import net.younguard.bighorn.comm.tlv.TlvObject;
 import net.younguard.bighorn.comm.util.LogErrorMessage;
+import net.younguard.bighorn.domain.AccountBaseInfo;
 import net.younguard.bighorn.domain.PlayerSummary;
 
 import org.apache.mina.core.session.IoSession;
@@ -47,8 +49,12 @@ public class PlayerSummaryQueryAdapter
 
 		try {
 			GameService gameService = BighornApplicationContextUtil.getGameService();
+			AccountService accountService = BighornApplicationContextUtil.getAccountService();
 
 			PlayerSummary player = gameService.queryPlayer(playerId);
+			AccountBaseInfo account = accountService.query(playerId);
+			player.setNickname(account.getNickname());
+			player.setAvatarUrl(account.getAvatarUrl());
 			logger.info("commandTag=[" + this.getTag() + "]|ErrorCode=[" + ErrorCode.SUCCESS + "]|sessionId=["
 					+ session.getId() + "]|device=[" + deviceId + "]|");
 

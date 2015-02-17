@@ -21,6 +21,12 @@ public class SessionDeviceObject
 	 * 
 	 */
 	private static final long serialVersionUID = -8733069412616001764L;
+	private String osVersion;
+	private String notifyToken;
+	private boolean online;
+	private int lastTryTime;
+	private long ioSessionId;
+	private String accountId;
 
 	public SessionDeviceObject(String osVersion, String notifyToken)
 	{
@@ -44,13 +50,6 @@ public class SessionDeviceObject
 
 		this.setAccountId(accountId);
 	}
-
-	private String osVersion;
-	private String notifyToken;
-	private boolean online;
-	private int lastTryTime;
-	private long ioSessionId;
-	private String accountId;
 
 	public String getOsVersion()
 	{

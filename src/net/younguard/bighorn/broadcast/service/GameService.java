@@ -3,6 +3,7 @@ package net.younguard.bighorn.broadcast.service;
 import java.util.List;
 
 import net.younguard.bighorn.domain.GameMasterInfo;
+import net.younguard.bighorn.domain.GameMemberMasterInfo;
 import net.younguard.bighorn.domain.GameStep;
 import net.younguard.bighorn.domain.PlayerSummary;
 
@@ -21,6 +22,8 @@ public interface GameService
 	public List<GameMasterInfo> queryHistoryPagination(short pageNum, short pageSize, String accountId);
 
 	public List<PlayerSummary> queryPlayersPagination(short pageNum, short pageSize);
+
+	public List<GameMemberMasterInfo> queryGameMembers(String gameId);
 
 	public PlayerSummary queryPlayer(String playerId);
 

@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.younguard.bighorn.CommandTag;
 import net.younguard.bighorn.ErrorCode;
+import net.younguard.bighorn.broadcast.service.AccountService;
 import net.younguard.bighorn.broadcast.service.GameService;
 import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
 import net.younguard.bighorn.chess.cmd.GameHistoryQueryPaginationReq;
@@ -13,7 +14,9 @@ import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
 import net.younguard.bighorn.comm.tlv.TlvObject;
 import net.younguard.bighorn.comm.util.LogErrorMessage;
+import net.younguard.bighorn.domain.AccountBaseInfo;
 import net.younguard.bighorn.domain.GameMasterInfo;
+import net.younguard.bighorn.domain.GameMemberMasterInfo;
 
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
@@ -49,8 +52,20 @@ public class GameHistoryQueryPaginationAdapter
 
 		try {
 			GameService gameService = BighornApplicationContextUtil.getGameService();
+			AccountService accountService = BighornApplicationContextUtil.getAccountService();
 
 			List<GameMasterInfo> games = gameService.queryHistoryPagination(pageNum, pageSize);
+			for (GameMasterInfo game : games) {
+				List<GameMemberMasterInfo> players = gameService.queryGameMembers(game.getGameId());
+
+				for (GameMemberMasterInfo player : players) {
+					AccountBaseInfo account = accountService.query(player.getAccountId());
+					player.setNickname(account.getNickname());
+					player.setAvatarUrl(account.getAvatarUrl());
+				}
+
+				game.setPlayers(players);
+			}
 			logger.info("commandTag=[" + this.getTag() + "]|ErrorCode=[" + ErrorCode.SUCCESS + "]|sessionId=["
 					+ session.getId() + "]|device=[" + deviceId + "]|");
 
