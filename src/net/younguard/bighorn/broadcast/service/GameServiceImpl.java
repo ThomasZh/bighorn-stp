@@ -6,16 +6,46 @@ import java.util.UUID;
 import net.younguard.bighorn.GlobalArgs;
 import net.younguard.bighorn.broadcast.dao.GameDao;
 import net.younguard.bighorn.broadcast.dao.GameManualDao;
-import net.younguard.bighorn.broadcast.dao.PlayerDao;
+import net.younguard.bighorn.broadcast.dao.GameMemberDao;
 import net.younguard.bighorn.broadcast.domain.Page;
 import net.younguard.bighorn.domain.GameMasterInfo;
 import net.younguard.bighorn.domain.GameMemberMasterInfo;
 import net.younguard.bighorn.domain.GameStep;
-import net.younguard.bighorn.domain.PlayerSummary;
 
 public class GameServiceImpl
 		implements GameService
 {
+	@Override
+	public String create(String playerId, short color, short timeRule, int timestamp)
+	{
+		String gameId = UUID.randomUUID().toString();
+		short state = GlobalArgs.GAME_STATE_INVITE;
+		short step = 0;
+		gameDao.add(gameId, timeRule, state, step, timestamp);
+
+		gameMemberDao.add(gameId, playerId, color, timestamp);
+
+		return gameId;
+	}
+
+	@Override
+	public void join(String gameId, String accountId, short color, int timestamp)
+	{
+		gameMemberDao.add(gameId, accountId, color, timestamp);
+	}
+
+	@Override
+	public void modifyGameState(String gameId, short state, int timestamp)
+	{
+		gameDao.updateState(gameId, state, timestamp);
+	}
+
+	@Override
+	public void modifyGameWinner(String gameId, String winnerId, int timestamp)
+	{
+		gameDao.updateWinner(gameId, winnerId, timestamp);
+	}
+
 	@Override
 	public List<GameMasterInfo> queryInvitePagination(short pageNum, short pageSize)
 	{
@@ -73,62 +103,28 @@ public class GameServiceImpl
 		return array;
 	}
 
-	@Override
-	public List<PlayerSummary> queryPlayersPagination(short pageNum, short pageSize)
-	{
-		Page<PlayerSummary> games = playerDao.queryPlayersPagination(pageNum, pageSize);
-		List<PlayerSummary> array = games.getPageItems();
+	// /////////////////////////////////////////////////////////
+	// member
 
-		return array;
+	public void createMember(String gameId, String accountId, short color, short state, int timestamp)
+	{
+
 	}
 
-	@Override
-	public PlayerSummary queryPlayer(String playerId)
+	public void modifyMemberState(String gameId, String accountId, short state, int timestamp)
 	{
-		return playerDao.select(playerId);
+
 	}
 
-	@Override
 	public List<GameMemberMasterInfo> queryGameMembers(String gameId)
 	{
-		return playerDao.selectGameMembers(gameId);
-	}
-
-	@Override
-	public String create(String playerId, short color, short timeRule, int timestamp)
-	{
-		String gameId = UUID.randomUUID().toString();
-		short state = GlobalArgs.GAME_STATE_INVITE;
-		short step = 0;
-		gameDao.add(gameId, timeRule, state, step, timestamp);
-
-		playerDao.add(gameId, playerId, color, timestamp);
-
-		return gameId;
-	}
-
-	@Override
-	public void join(String gameId, String accountId, short color, int timestamp)
-	{
-		playerDao.add(gameId, accountId, color, timestamp);
-	}
-
-	@Override
-	public void modifyGameState(String gameId, short state, int timestamp)
-	{
-		gameDao.updateState(gameId, state, timestamp);
-	}
-
-	@Override
-	public void modifyGameWinner(String gameId, String winnerId, int timestamp)
-	{
-		gameDao.updateWinner(gameId, winnerId, timestamp);
+		return null;
 	}
 
 	@Override
 	public String queryOpponentId(String gameId, String playerId)
 	{
-		List<GameMemberMasterInfo> array = playerDao.selectGameMembers(gameId);
+		List<GameMemberMasterInfo> array = gameMemberDao.select(gameId);
 
 		for (GameMemberMasterInfo player : array) {
 			if (!playerId.equals(player.getAccountId())) {
@@ -139,39 +135,42 @@ public class GameServiceImpl
 		return null;
 	}
 
+	// /////////////////////////////////////////////////////////
+	// manual
+
 	@Override
 	public List<GameStep> queryGameManual(String gameId)
 	{
 		short lastStep = 0;
-		return manualDao.select(gameId, lastStep);
+		return gameManualDao.select(gameId, lastStep);
 	}
 
 	@Override
 	public List<GameStep> queryGameManual(String gameId, short lastStep)
 	{
-		return manualDao.select(gameId, lastStep);
+		return gameManualDao.select(gameId, lastStep);
 	}
 
 	@Override
 	public void addStep(String gameId, String accountId, short step, short color, short x, short y, int timestamp)
 	{
-		manualDao.add(gameId, accountId, step, color, x, y, timestamp);
+		gameManualDao.add(gameId, accountId, step, color, x, y, timestamp);
 	}
 
 	// ////////////////////////////////////////////////////////////
 
 	private GameDao gameDao;
-	private PlayerDao playerDao;
-	private GameManualDao manualDao;
+	private GameMemberDao gameMemberDao;
+	private GameManualDao gameManualDao;
 
-	public PlayerDao getPlayerDao()
+	public GameMemberDao getGameMemberDao()
 	{
-		return playerDao;
+		return gameMemberDao;
 	}
 
-	public void setPlayerDao(PlayerDao playerDao)
+	public void setGameMemberDao(GameMemberDao playerDao)
 	{
-		this.playerDao = playerDao;
+		this.gameMemberDao = playerDao;
 	}
 
 	public GameDao getGameDao()
@@ -184,14 +183,14 @@ public class GameServiceImpl
 		this.gameDao = gameDao;
 	}
 
-	public GameManualDao getManualDao()
+	public GameManualDao getGameManualDao()
 	{
-		return manualDao;
+		return gameManualDao;
 	}
 
-	public void setManualDao(GameManualDao manualDao)
+	public void setGameManualDao(GameManualDao manualDao)
 	{
-		this.manualDao = manualDao;
+		this.gameManualDao = manualDao;
 	}
 
 }

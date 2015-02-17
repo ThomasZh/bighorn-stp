@@ -9,6 +9,7 @@ import net.younguard.bighorn.GlobalArgs;
 import net.younguard.bighorn.broadcast.domain.SessionAccountObject;
 import net.younguard.bighorn.broadcast.domain.SessionDeviceObject;
 import net.younguard.bighorn.broadcast.service.GameService;
+import net.younguard.bighorn.broadcast.service.PlayerService;
 import net.younguard.bighorn.broadcast.service.SessionService;
 import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
 import net.younguard.bighorn.chess.cmd.GameResignNotify;
@@ -60,6 +61,7 @@ public class GameResignAdapter
 		try {
 			GameService gameService = BighornApplicationContextUtil.getGameService();
 			SessionService sessionService = BighornApplicationContextUtil.getSessionService();
+			PlayerService playerService = BighornApplicationContextUtil.getPlayerService();
 
 			gameService.modifyGameState(gameId, GlobalArgs.GAME_STATE_COMPLETE, timestamp);
 			String opponentId = gameService.queryOpponentId(gameId, accountId);
@@ -70,6 +72,20 @@ public class GameResignAdapter
 			GameResignResp respCmd = new GameResignResp(this.getSequence(), ErrorCode.SUCCESS);
 			TlvObject tlvResp = CommandParser.encode(respCmd);
 			session.write(tlvResp);
+
+			// recount number of my summary(playing & completed)
+			short num = playerService.queryPlayingNum(accountId);
+			playerService.modifyPlayingNum(accountId, --num);
+
+			num = playerService.queryCompletedNum(accountId);
+			playerService.modifyCompletedNum(accountId, ++num);
+
+			// recount number of opponent's summary(playing & completed)
+			num = playerService.queryPlayingNum(opponentId);
+			playerService.modifyPlayingNum(opponentId, --num);
+
+			num = playerService.queryCompletedNum(opponentId);
+			playerService.modifyCompletedNum(opponentId, ++num);
 
 			// Logic: send message to opponent
 			SessionAccountObject opponentSao = sessionService.getAccount(opponentId);

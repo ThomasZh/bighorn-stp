@@ -6,7 +6,7 @@ import java.util.List;
 import net.younguard.bighorn.CommandTag;
 import net.younguard.bighorn.ErrorCode;
 import net.younguard.bighorn.broadcast.service.AccountService;
-import net.younguard.bighorn.broadcast.service.GameService;
+import net.younguard.bighorn.broadcast.service.PlayerService;
 import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
 import net.younguard.bighorn.chess.cmd.PlayersQueryPaginationReq;
 import net.younguard.bighorn.chess.cmd.PlayersQueryPaginationResp;
@@ -15,7 +15,7 @@ import net.younguard.bighorn.comm.ResponseCommand;
 import net.younguard.bighorn.comm.tlv.TlvObject;
 import net.younguard.bighorn.comm.util.LogErrorMessage;
 import net.younguard.bighorn.domain.AccountBaseInfo;
-import net.younguard.bighorn.domain.PlayerSummary;
+import net.younguard.bighorn.domain.PlayerMasterInfo;
 
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
@@ -50,11 +50,11 @@ public class PlayersQueryPaginationAdapter
 		String deviceId = (String) session.getAttribute("deviceId");
 
 		try {
-			GameService gameService = BighornApplicationContextUtil.getGameService();
+			PlayerService playerService = BighornApplicationContextUtil.getPlayerService();
 			AccountService accountService = BighornApplicationContextUtil.getAccountService();
 
-			List<PlayerSummary> players = gameService.queryPlayersPagination(pageNum, pageSize);
-			for (PlayerSummary player : players) {
+			List<PlayerMasterInfo> players = playerService.queryPagination(pageNum, pageSize);
+			for (PlayerMasterInfo player : players) {
 				AccountBaseInfo account = accountService.query(player.getAccountId());
 				player.setNickname(account.getNickname());
 				player.setAvatarUrl(account.getAvatarUrl());

@@ -80,6 +80,6 @@ public class GameManualDaoImpl
 		return array;
 	}
 
-	private final static Logger logger = LoggerFactory.getLogger(PlayerDaoImpl.class);
+	private final static Logger logger = LoggerFactory.getLogger(GameMemberDaoImpl.class);
 
 }

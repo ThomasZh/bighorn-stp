@@ -1,18 +1,26 @@
 package net.younguard.bighorn.broadcast.dao;
 
-import java.util.List;
-
 import net.younguard.bighorn.broadcast.domain.Page;
-import net.younguard.bighorn.domain.GameMemberMasterInfo;
-import net.younguard.bighorn.domain.PlayerSummary;
+import net.younguard.bighorn.domain.PlayerDetailInfo;
+import net.younguard.bighorn.domain.PlayerMasterInfo;
 
 public interface PlayerDao
 {
-	public Page<PlayerSummary> queryPlayersPagination(short pageNum, short pageSize);
+	public void add(String accountId);
 
-	public PlayerSummary select(String playerId);
+	public void updateInviteNum(String accountId, short num);
 
-	public List<GameMemberMasterInfo> selectGameMembers(String gameId);
-	
-	public void add(String gameId, String playerId, short color, int timestamp);
+	public void updatePlayingNum(String accountId, short num);
+
+	public void updateCompletedNum(String accountId, short num);
+
+	public short selectInviteNum(String accountId);
+
+	public short selectPlayingNum(String accountId);
+
+	public short selectCompletedNum(String accountId);
+
+	public Page<PlayerMasterInfo> selectPagination(short pageNum, short pageSize);
+
+	public PlayerDetailInfo select(String accountId);
 }

@@ -9,6 +9,7 @@ import net.younguard.bighorn.GlobalArgs;
 import net.younguard.bighorn.broadcast.domain.SessionAccountObject;
 import net.younguard.bighorn.broadcast.domain.SessionDeviceObject;
 import net.younguard.bighorn.broadcast.service.GameService;
+import net.younguard.bighorn.broadcast.service.PlayerService;
 import net.younguard.bighorn.broadcast.service.SessionService;
 import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
 import net.younguard.bighorn.chess.cmd.GameJoinNotify;
@@ -61,6 +62,7 @@ public class GameJoinAdapter
 		try {
 			GameService gameService = BighornApplicationContextUtil.getGameService();
 			SessionService sessionService = BighornApplicationContextUtil.getSessionService();
+			PlayerService playerService = BighornApplicationContextUtil.getPlayerService();
 
 			gameService.join(gameId, accountId, color, timestamp);
 			gameService.modifyGameState(gameId, GlobalArgs.GAME_STATE_PLAYING, timestamp);
@@ -71,8 +73,19 @@ public class GameJoinAdapter
 			TlvObject tlvResp = CommandParser.encode(respCmd);
 			session.write(tlvResp);
 
+			// recount number of my summary(playing)
+			short num = playerService.queryPlayingNum(accountId);
+			playerService.modifyPlayingNum(accountId, ++num);
+
 			// Logic: send message to opponent
 			String opponentId = gameService.queryOpponentId(gameId, accountId);
+
+			// recount number of opponent's summary(invite & playing)
+			num = playerService.queryInviteNum(opponentId);
+			playerService.modifyInviteNum(opponentId, --num);
+
+			num = playerService.queryPlayingNum(opponentId);
+			playerService.modifyPlayingNum(opponentId, ++num);
 
 			SessionAccountObject opponentSao = sessionService.getAccount(opponentId);
 			String opponentDeviceId = opponentSao.getDeviceId();

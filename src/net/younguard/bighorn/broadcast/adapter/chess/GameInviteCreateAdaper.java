@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import net.younguard.bighorn.CommandTag;
 import net.younguard.bighorn.ErrorCode;
 import net.younguard.bighorn.broadcast.service.GameService;
+import net.younguard.bighorn.broadcast.service.PlayerService;
 import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
 import net.younguard.bighorn.chess.cmd.GameInviteCreateReq;
 import net.younguard.bighorn.chess.cmd.GameInviteCreateResp;
@@ -50,10 +51,14 @@ public class GameInviteCreateAdaper
 
 		try {
 			GameService gameService = BighornApplicationContextUtil.getGameService();
+			PlayerService playerService = BighornApplicationContextUtil.getPlayerService();
 
 			String gameId = gameService.create(accountId, color, timeRule, timestamp);
 			logger.info("commandTag=[" + this.getTag() + "]|ErrorCode=[" + ErrorCode.SUCCESS + "]|sessionId=["
 					+ session.getId() + "]|device=[" + deviceId + "]|");
+			
+			short num = playerService.queryInviteNum(accountId);
+			playerService.modifyInviteNum(accountId, ++num);
 
 			GameInviteCreateResp respCmd = new GameInviteCreateResp(this.getSequence(), ErrorCode.SUCCESS, gameId);
 			return respCmd;
