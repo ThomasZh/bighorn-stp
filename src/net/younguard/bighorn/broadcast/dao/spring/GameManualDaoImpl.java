@@ -23,8 +23,8 @@ public class GameManualDaoImpl
 	public void add(final String gameId, final String accountId, final short step, final short color, final short x,
 			final short y, final int timestamp)
 	{
-		String sql = "INSERT INTO bighorn_game_manual (game_id,player_id,step,color,x,y,timestamp) VALUES (?,?,?,?,?,?,?)";
-		logger.debug("INSERT INTO bighorn_game_manual (game_id,player_id,step,color,x,y,timestamp) VALUES (" + gameId
+		String sql = "INSERT INTO bighorn_game_manual (game_id,account_id,step,color,x,y,timestamp) VALUES (?,?,?,?,?,?,?)";
+		logger.debug("INSERT INTO bighorn_game_manual (game_id,account_id,step,color,x,y,timestamp) VALUES (" + gameId
 				+ "," + accountId + "," + step + "," + color + "," + x + "," + y + "," + timestamp + ")");
 
 		this.getJdbcTemplate().update(sql, new PreparedStatementSetter()
@@ -45,13 +45,13 @@ public class GameManualDaoImpl
 	}
 
 	@Override
-	public List<GameStep> select(final String gameId, short lastStep)
+	public List<GameStep> select(final String gameId, final short lastStep)
 	{
 		final List<GameStep> array = new ArrayList<GameStep>();
 
-		String sql = "SELECT step,color,x,y FROM bighorn_game_manual WHERE game_id=? AND step>? ORDER BY step ASC";
-		logger.debug("SELECT step,color,x,y FROM bighorn_game_manual WHERE game_id=" + gameId + " AND step>" + lastStep
-				+ " ORDER BY step ASC");
+		String sql = "SELECT step,color,x,y,account_id FROM bighorn_game_manual WHERE game_id=? AND step>? ORDER BY step ASC";
+		logger.debug("SELECT step,color,x,y,account_id FROM bighorn_game_manual WHERE game_id=" + gameId + " AND step>"
+				+ lastStep + " ORDER BY step ASC");
 
 		this.getJdbcTemplate().query(sql, new PreparedStatementSetter()
 		{
@@ -59,6 +59,7 @@ public class GameManualDaoImpl
 					throws SQLException
 			{
 				ps.setString(1, gameId);
+				ps.setShort(2, lastStep);
 			}
 		}, new RowCallbackHandler()
 		{
@@ -72,6 +73,7 @@ public class GameManualDaoImpl
 				data.setColor(rs.getShort(n++));
 				data.setX(rs.getShort(n++));
 				data.setY(rs.getShort(n++));
+				data.setAccountId(rs.getString(n++));
 
 				array.add(data);
 			}

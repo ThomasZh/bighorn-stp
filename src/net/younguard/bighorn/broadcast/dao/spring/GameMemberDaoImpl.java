@@ -57,8 +57,8 @@ public class GameMemberDaoImpl
 	{
 		final List<GameMemberMasterInfo> array = new ArrayList<GameMemberMasterInfo>();
 
-		String sql = "SELECT account_id,state FROM bighorn_game_member WHERE game_id=?";
-		logger.debug("SELECT account_id,state FROM bighorn_game_member WHERE game_id=" + gameId);
+		String sql = "SELECT account_id,state,color FROM bighorn_game_member WHERE game_id=?";
+		logger.debug("SELECT account_id,state,color FROM bighorn_game_member WHERE game_id=" + gameId);
 
 		this.getJdbcTemplate().query(sql, new PreparedStatementSetter()
 		{
@@ -75,7 +75,8 @@ public class GameMemberDaoImpl
 				GameMemberMasterInfo data = new GameMemberMasterInfo();
 
 				int n = 1;
-				data.setAccountId(gameId);
+				data.setAccountId(rs.getString(n++));
+				data.setState(rs.getShort(n++));
 				data.setState(rs.getShort(n++));
 
 				array.add(data);
@@ -83,6 +84,23 @@ public class GameMemberDaoImpl
 		});
 
 		return array;
+	}
+
+	@Override
+	public void delete(final String gameId, final String playerId)
+	{
+		String sql = "DELETE FROM bighorn_game_member WHERE game_id=? AND account_id=?";
+		logger.debug("DELETE FROM bighorn_game_member WHERE game_id=" + gameId + " AND account_id=" + playerId);
+
+		this.getJdbcTemplate().update(sql, new PreparedStatementSetter()
+		{
+			public void setValues(PreparedStatement ps)
+					throws SQLException
+			{
+				ps.setString(1, gameId);
+				ps.setString(2, playerId);
+			}
+		});
 	}
 
 	private final static Logger logger = LoggerFactory.getLogger(GameMemberDaoImpl.class);

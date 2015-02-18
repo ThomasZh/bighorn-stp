@@ -8,6 +8,7 @@ import net.younguard.bighorn.account.cmd.AccountInfoModifyReq;
 import net.younguard.bighorn.account.cmd.AccountInfoModifyResp;
 import net.younguard.bighorn.broadcast.service.AccountService;
 import net.younguard.bighorn.broadcast.service.DeviceService;
+import net.younguard.bighorn.broadcast.service.PlayerService;
 import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
 import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
@@ -52,6 +53,7 @@ public class AccountInfoModifyAdapter
 		try {
 			AccountService accountService = BighornApplicationContextUtil.getAccountService();
 			DeviceService deviceService = BighornApplicationContextUtil.getDeviceService();
+			PlayerService playerService = BighornApplicationContextUtil.getPlayerService();
 
 			if (accountId != null && accountId.length() > 0) {
 				if (accountService.isExist(accountId)) { // modify
@@ -64,6 +66,7 @@ public class AccountInfoModifyAdapter
 							+ session.getId() + "]|device=[" + deviceId + "]|nickname=[" + nickname + "]");
 
 					accountId = accountService.create(nickname, avatarUrl, timestamp);
+					playerService.add(accountId);	// add into summary table 
 				}
 			} else { // create
 				logger.info("commandTag=[" + this.getTag() + "]|create an new account|sessionId=[" + session.getId()

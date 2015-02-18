@@ -11,4 +11,6 @@ public interface AccountDao
 	public void update(String accountId, String nickname, String avatarUrl, int timestamp);
 
 	public AccountBaseInfo select(String accountId);
+
+	public void delete(String accountId);
 }

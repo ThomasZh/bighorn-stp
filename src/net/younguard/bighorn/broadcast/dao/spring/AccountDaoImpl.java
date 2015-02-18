@@ -24,7 +24,7 @@ public class AccountDaoImpl
 		String sql = "SELECT count(account_id) FROM bighorn_account WHERE account_id=?";
 		logger.debug("SELECT count(account_id) FROM bighorn_account WHERE account_id=" + accountId);
 
-		int count = this.getJdbcTemplate().queryForObject(sql, Integer.class);
+		int count = this.getJdbcTemplate().queryForInt(sql, accountId);
 		return count > 0 ? true : false;
 	}
 
@@ -110,5 +110,22 @@ public class AccountDaoImpl
 		return data;
 	}
 
+	@Override
+	public void delete(final String accountId)
+	{
+		String sql = "DELETE FROM bighorn_account WHERE account_id=?";
+		logger.debug("DELETE FROM bighorn_account WHERE account_id=" + accountId);
+
+		this.getJdbcTemplate().update(sql, new PreparedStatementSetter()
+		{
+			public void setValues(PreparedStatement ps)
+					throws SQLException
+			{
+				ps.setString(1, accountId);
+			}
+		});
+	}
+
 	private final static Logger logger = LoggerFactory.getLogger(AccountDaoImpl.class);
+
 }

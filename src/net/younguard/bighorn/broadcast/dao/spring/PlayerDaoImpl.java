@@ -27,7 +27,7 @@ public class PlayerDaoImpl
 	@Override
 	public void add(final String accountId)
 	{
-		String sql = "INSERT INTO bighorn_player_summary (account_id,) VALUES (?)";
+		String sql = "INSERT INTO bighorn_player_summary (account_id) VALUES (?)";
 		logger.debug("INSERT INTO bighorn_player_summary (account_id) VALUES (" + accountId + ")");
 
 		this.getJdbcTemplate().update(sql, new PreparedStatementSetter()
@@ -158,7 +158,7 @@ public class PlayerDaoImpl
 
 		String countSql = "SELECT count(account_id) FROM bighorn_player_summary";
 		String sql = "SELECT account_id,invite_num,playing_num,completed_num "
-				+ " FROM bighorn_player_summary ORDER BY played_num DESC";
+				+ " FROM bighorn_player_summary ORDER BY completed_num DESC";
 		logger.debug("SELECT account_id,invite_num,playing_num,completed_num "
 				+ " FROM bighorn_player_summary ORDER BY completed_num DESC");
 
@@ -186,8 +186,8 @@ public class PlayerDaoImpl
 	{
 		final PlayerDetailInfo data = new PlayerDetailInfo();
 
-		String sql = "SELECT account_id,invite_num,playing_num,completed_num FROM bighorn_player_summary WHERE account_id=?";
-		logger.debug("SELECT account_id,invite_num,playing_num,completed_num FROM bighorn_player_summary WHERE account_id="
+		String sql = "SELECT invite_num,playing_num,completed_num FROM bighorn_player_summary WHERE account_id=?";
+		logger.debug("SELECT invite_num,playing_num,completed_num FROM bighorn_player_summary WHERE account_id="
 				+ accountId);
 
 		this.getJdbcTemplate().query(sql, new PreparedStatementSetter()

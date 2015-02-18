@@ -5,9 +5,12 @@ import java.sql.SQLException;
 
 import net.younguard.bighorn.GlobalArgs;
 import net.younguard.bighorn.broadcast.dao.DeviceAccountDao;
+import net.younguard.bighorn.comm.util.LogErrorMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
@@ -22,8 +25,47 @@ public class DeviceAccountDaoImpl
 		logger.debug("SELECT count(device_id) FROM bighorn_device_account WHERE device_id=" + deviceId
 				+ " AND account_id=" + accountId);
 
-		int count = this.getJdbcTemplate().queryForObject(sql, Integer.class);
+		int count = this.getJdbcTemplate().queryForInt(sql, new Object[] { deviceId, accountId });
 		return count > 0 ? true : false;
+	}
+
+	@Override
+	public boolean isActive(String deviceId, String accountId)
+	{
+		int count = 0;
+
+		try {
+			String sql = "SELECT state FROM bighorn_device_account WHERE device_id=? AND account_id=?";
+			logger.debug("SELECT state FROM bighorn_device_account WHERE device_id=" + deviceId + " AND account_id="
+					+ accountId);
+
+			Object[] params = new Object[] { deviceId, accountId };
+			count = this.getJdbcTemplate().queryForInt(sql, params);
+		} catch (EmptyResultDataAccessException ee) {
+		} catch (IncorrectResultSizeDataAccessException ie) {
+			logger.warn("SELECT state FROM bighorn_device_account WHERE device_id=" + deviceId + " AND account_id="
+					+ accountId);
+			logger.warn(LogErrorMessage.getFullInfo(ie));
+		}
+
+		return count == GlobalArgs.DEVICE_ACCOUNT_STATE_ACTIVE ? true : false;
+	}
+
+	@Override
+	public void delete(final String deviceId, final String accountId)
+	{
+		String sql = "DELETE FROM bighorn_device_account WHERE device_id=? AND account_id=?";
+		logger.debug("DELETE FROM bighorn_device_account WHERE device_id=" + deviceId + " AND account_id=" + accountId);
+
+		this.getJdbcTemplate().update(sql, new PreparedStatementSetter()
+		{
+			public void setValues(PreparedStatement ps)
+					throws SQLException
+			{
+				ps.setString(1, deviceId);
+				ps.setString(2, accountId);
+			}
+		});
 	}
 
 	@Override
@@ -78,4 +120,5 @@ public class DeviceAccountDaoImpl
 	}
 
 	private final static Logger logger = LoggerFactory.getLogger(DeviceAccountDaoImpl.class);
+
 }

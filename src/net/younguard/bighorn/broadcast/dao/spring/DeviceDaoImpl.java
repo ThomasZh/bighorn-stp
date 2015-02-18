@@ -184,7 +184,9 @@ public class DeviceDaoImpl
 		String sql = "SELECT count(device_id) FROM bighorn_device WHERE device_id=?";
 		logger.debug("SELECT count(device_id) FROM bighorn_device WHERE device_id=" + deviceId);
 
-		int count = this.getJdbcTemplate().queryForObject(sql, Integer.class);
+		int count = this.getJdbcTemplate().queryForInt(sql, deviceId);
+		
+		logger.debug("count: " + count);
 		return count > 0 ? true : false;
 	}
 

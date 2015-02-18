@@ -22,8 +22,8 @@ public class GameDaoImpl
 	@Override
 	public void add(final String gameId, final short timeRule, final short state, final short step, final int timestamp)
 	{
-		String sql = "INSERT INTO bighorn_game (game_id,time_rule,state,step,create_time,last_update_time) VALUES (?,?,?,?,?,?,?)";
-		logger.debug("INSERT INTO bighorn_game (game_id,time_rule,state,step,create_time,last_update_time) VALUES ("
+		String sql = "INSERT INTO bighorn_game (game_id,time_rule,state,last_step,create_time,last_update_time) VALUES (?,?,?,?,?,?)";
+		logger.debug("INSERT INTO bighorn_game (game_id,time_rule,state,last_step,create_time,last_update_time) VALUES ("
 				+ gameId + "," + timeRule + "," + state + "," + step + "," + timestamp + "," + timestamp + ")");
 
 		this.getJdbcTemplate().update(sql, new PreparedStatementSetter()
@@ -120,13 +120,13 @@ public class GameDaoImpl
 	{
 		PaginationHelper<GameMasterInfo> ph = new PaginationHelper<GameMasterInfo>();
 
-		String countSql = "SELECT count(g.game_id) FROM bighorn_game g,bighorn_game_player p "
+		String countSql = "SELECT count(g.game_id) FROM bighorn_game g,bighorn_game_member p "
 				+ " WHERE g.state=? AND g.game_id=p.game_id AND p.account_id=?";
 		String sql = "SELECT g.game_id,g.time_rule,g.create_time,g.last_update_time,g.last_step,g.winner_id "
-				+ " FROM bighorn_game g,bighorn_game_player p "
+				+ " FROM bighorn_game g,bighorn_game_member p "
 				+ " WHERE g.state=? AND g.game_id=p.game_id AND p.account_id=? ORDER BY g.last_update_time DESC";
 		logger.debug("SELECT g.game_id,g.time_rule,g.create_time,g.last_update_time,g.last_step,g.winner_id "
-				+ " FROM bighorn_game g,bighorn_game_player p " + " WHERE g.state=" + state
+				+ " FROM bighorn_game g,bighorn_game_member p " + " WHERE g.state=" + state
 				+ " AND g.game_id=p.game_id AND p.account_id=" + accountId + " ORDER BY g.last_update_time DESC");
 
 		return ph.fetchPage(this.getJdbcTemplate(), countSql, sql, new Object[] { state }, pageNum, pageSize,
