@@ -3,6 +3,7 @@ package net.younguard.bighorn.broadcast.tcp.server;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketAddress;
 
+import net.younguard.bighorn.BroadcastCommandParser;
 import net.younguard.bighorn.ErrorCode;
 import net.younguard.bighorn.broadcast.adapter.BroadAdapterParser;
 import net.younguard.bighorn.broadcast.service.DeviceService;
@@ -66,9 +67,18 @@ public class TcpServerEventHandler
 
 			ResponseCommand respCmd = (ResponseCommand) reqCmd.execute(session);
 			if (respCmd != null) {
-				TlvObject respTlv = BroadAdapterParser.encode(respCmd);
-				session.write(respTlv);
-				logger.debug("send response command: " + respCmd.getTag());
+				TlvObject respTlv = null;
+				try {
+					respTlv = BroadcastCommandParser.encode(respCmd);
+					session.write(respTlv);
+					logger.debug("send response command: " + respCmd.getTag());
+				} catch (UnsupportedEncodingException uee) {
+					logger.warn("sessionId=[" + session.getId() + "]|commandTag=[" + pkg.getTag() + "]|ErrorCode=["
+							+ ErrorCode.ENCODING_FAILURE + "]|" + LogErrorMessage.getFullInfo(uee));
+
+					session.close(true);
+					return;// break the logic blow
+				}
 			}
 			long endTime = System.currentTimeMillis();
 			long deltaTime = endTime - startTime;

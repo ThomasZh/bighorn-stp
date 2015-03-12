@@ -7,7 +7,6 @@ import java.net.InetSocketAddress;
 import net.younguard.bighorn.BroadcastCommandParser;
 import net.younguard.bighorn.ErrorCode;
 import net.younguard.bighorn.broadcast.cmd.MsgPingReq;
-import net.younguard.bighorn.broadcast.cmd.QueryOnlineNumReq;
 import net.younguard.bighorn.comm.codec.TlvPackageCodecFactory;
 import net.younguard.bighorn.comm.tlv.TlvObject;
 import net.younguard.bighorn.comm.util.DatetimeUtil;
@@ -44,7 +43,7 @@ public class TcpClientDemo
 		logger.info("TCP client started.");
 
 		String username = "Tony";
-		for (int i = 0;; i++) {
+		for (;;) {
 			int timestamp = DatetimeUtil.currentTimestamp();
 			Thread.sleep(1000); // 1s
 
@@ -64,28 +63,6 @@ public class TcpClientDemo
 						+ "]|couldn't be written out MsgPingReq completely for some reason.(e.g. Connection is closed)");
 
 				break;
-			}
-
-			if (i % 30 == 0) {
-				QueryOnlineNumReq qonReqCmd = new QueryOnlineNumReq(timestamp);
-				TlvObject qonTlv = BroadcastCommandParser.encode(qonReqCmd);
-				future = session.write(qonTlv);
-				// Wait until the message is completely written out to the
-				// O/S buffer.
-				future.awaitUninterruptibly();
-				if (future.isWritten()) {
-					logger.info("Send query online number request=(" + reqCmd.getTag() + ")");
-				} else {
-					// The messsage couldn't be written out completely for
-					// some reason. (e.g. Connection is closed)
-					logger.warn("sessionId=["
-							+ session.getId()
-							+ "]|ErrorCode=["
-							+ ErrorCode.CONNECTION_CLOSED
-							+ "]|couldn't be written out QueryOnlineNumReq completely for some reason.(e.g. Connection is closed)");
-
-					break;
-				}
 			}
 		}
 	}

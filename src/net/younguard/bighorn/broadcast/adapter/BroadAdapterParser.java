@@ -3,8 +3,11 @@ package net.younguard.bighorn.broadcast.adapter;
 import java.io.UnsupportedEncodingException;
 
 import net.younguard.bighorn.CommandTag;
+import net.younguard.bighorn.badge.cmd.QueryHistroryListBadgeReq;
+import net.younguard.bighorn.badge.cmd.QueryInviteListBadgeReq;
+import net.younguard.bighorn.badge.cmd.QueryPlayingListBadgeReq;
+import net.younguard.bighorn.badge.cmd.QuerySummaryBadgeReq;
 import net.younguard.bighorn.broadcast.adapter.broadcast.MsgPingAdapter;
-import net.younguard.bighorn.broadcast.adapter.broadcast.QueryOnlineNumAdapter;
 import net.younguard.bighorn.broadcast.adapter.chess.GameHistoryQueryPaginationAdapter;
 import net.younguard.bighorn.broadcast.adapter.chess.GameInviteCreateAdapter;
 import net.younguard.bighorn.broadcast.adapter.chess.GameInviteQueryPaginationAdapter;
@@ -61,6 +64,15 @@ public class BroadAdapterParser
 		case CommandTag.SOCKET_CLOSE_REQUEST:
 			return new SocketCloseAdapter().decode(tlv);
 
+		case CommandTag.QUERY_SUMMSRY_BADGE_NUMBER_REQUEST:
+			return new QuerySummaryBadgeReq().decode(tlv);
+		case CommandTag.QUERY_INVITE_LIST_BADGE_NUMBER_REQUEST:
+			return new QueryInviteListBadgeReq().decode(tlv);
+		case CommandTag.QUERY_PLAYING_LIST_BADGE_NUMBER_REQUEST:
+			return new QueryPlayingListBadgeReq().decode(tlv);
+		case CommandTag.QUERY_HISTORY_LIST_BADGE_NUMBER_REQUEST:
+			return new QueryHistroryListBadgeReq().decode(tlv);
+
 		case CommandTag.GAME_HISTORY_QUERY_PAGINATION_REQUEST:
 			return new GameHistoryQueryPaginationAdapter().decode(tlv);
 		case CommandTag.GAME_INVITE_CREATE_REQUEST:
@@ -94,8 +106,6 @@ public class BroadAdapterParser
 
 		case CommandTag.MESSAGE_PING_REQUEST:
 			return new MsgPingAdapter().decode(tlv);
-		case CommandTag.QUERY_ONLINE_NUMBER_REQUEST:
-			return new QueryOnlineNumAdapter().decode(tlv);
 
 		default:
 			throw new UnsupportedEncodingException("Unknown command=[" + tlv.getTag() + "]");
