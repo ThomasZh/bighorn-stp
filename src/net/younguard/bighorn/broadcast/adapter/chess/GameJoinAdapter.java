@@ -6,6 +6,7 @@ import java.util.Map;
 import net.younguard.bighorn.CommandTag;
 import net.younguard.bighorn.ErrorCode;
 import net.younguard.bighorn.GlobalArgs;
+import net.younguard.bighorn.badgenum.BadgeNumService;
 import net.younguard.bighorn.broadcast.domain.SessionAccountObject;
 import net.younguard.bighorn.broadcast.domain.SessionDeviceObject;
 import net.younguard.bighorn.broadcast.service.GameService;
@@ -63,6 +64,7 @@ public class GameJoinAdapter
 			GameService gameService = BighornApplicationContextUtil.getGameService();
 			SessionService sessionService = BighornApplicationContextUtil.getSessionService();
 			PlayerService playerService = BighornApplicationContextUtil.getPlayerService();
+			BadgeNumService badgeNumService = BighornApplicationContextUtil.getBadgeNumService();
 
 			gameService.join(gameId, accountId, color, timestamp);
 			gameService.modifyGameState(gameId, GlobalArgs.GAME_STATE_PLAYING, timestamp);
@@ -86,6 +88,9 @@ public class GameJoinAdapter
 
 			num = playerService.queryPlayingNum(opponentId);
 			playerService.modifyPlayingNum(opponentId, ++num);
+
+			short badgeNum = badgeNumService.queryPlayingNum(opponentId);
+			badgeNumService.modifyPlayingNum(opponentId, ++badgeNum);
 
 			SessionAccountObject opponentSao = sessionService.getAccount(opponentId);
 			String opponentDeviceId = opponentSao.getDeviceId();

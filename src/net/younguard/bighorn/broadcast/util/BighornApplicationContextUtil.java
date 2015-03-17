@@ -1,5 +1,6 @@
 package net.younguard.bighorn.broadcast.util;
 
+import net.younguard.bighorn.badgenum.BadgeNumService;
 import net.younguard.bighorn.broadcast.service.AccountService;
 import net.younguard.bighorn.broadcast.service.DeviceService;
 import net.younguard.bighorn.broadcast.service.GameService;
@@ -49,4 +50,8 @@ public class BighornApplicationContextUtil
 		return (PlayerService) context.getBean("broadcastPlayerService");
 	}
 
+	public static BadgeNumService getBadgeNumService()
+	{
+		return (BadgeNumService) context.getBean("broadcastBadgeNumService");
+	}
 }

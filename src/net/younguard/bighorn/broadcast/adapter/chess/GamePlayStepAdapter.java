@@ -5,14 +5,15 @@ import java.util.Map;
 
 import net.younguard.bighorn.CommandTag;
 import net.younguard.bighorn.ErrorCode;
+import net.younguard.bighorn.badgenum.BadgeNumService;
 import net.younguard.bighorn.broadcast.domain.SessionAccountObject;
 import net.younguard.bighorn.broadcast.domain.SessionDeviceObject;
 import net.younguard.bighorn.broadcast.service.GameService;
 import net.younguard.bighorn.broadcast.service.SessionService;
 import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
+import net.younguard.bighorn.chess.cmd.GamePlayStepNotify;
 import net.younguard.bighorn.chess.cmd.GamePlayStepReq;
 import net.younguard.bighorn.chess.cmd.GamePlayStepResp;
-import net.younguard.bighorn.chess.cmd.GamePlayStepNotify;
 import net.younguard.bighorn.comm.CommandParser;
 import net.younguard.bighorn.comm.RequestCommand;
 import net.younguard.bighorn.comm.ResponseCommand;
@@ -63,6 +64,7 @@ public class GamePlayStepAdapter
 		try {
 			GameService gameService = BighornApplicationContextUtil.getGameService();
 			SessionService sessionService = BighornApplicationContextUtil.getSessionService();
+			BadgeNumService badgeNumService = BighornApplicationContextUtil.getBadgeNumService();
 
 			gameService.addStep(gameId, accountId, step, color, x, y, timestamp);
 			logger.info("commandTag=[" + this.getTag() + "]|ErrorCode=[" + ErrorCode.SUCCESS + "]|sessionId=["
@@ -74,6 +76,9 @@ public class GamePlayStepAdapter
 
 			// Logic: send message to opponent
 			String opponentId = gameService.queryOpponentId(gameId, accountId);
+
+			short badgeNum = badgeNumService.queryPlayingNum(opponentId);
+			badgeNumService.modifyPlayingNum(opponentId, ++badgeNum);
 
 			SessionAccountObject opponentSao = sessionService.getAccount(opponentId);
 			String opponentDeviceId = opponentSao.getDeviceId();

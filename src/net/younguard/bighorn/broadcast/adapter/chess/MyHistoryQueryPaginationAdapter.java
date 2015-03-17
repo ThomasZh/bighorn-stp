@@ -1,10 +1,12 @@
 package net.younguard.bighorn.broadcast.adapter.chess;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.younguard.bighorn.CommandTag;
 import net.younguard.bighorn.ErrorCode;
+import net.younguard.bighorn.badgenum.BadgeNumService;
 import net.younguard.bighorn.broadcast.service.AccountService;
 import net.younguard.bighorn.broadcast.service.GameService;
 import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
@@ -17,6 +19,7 @@ import net.younguard.bighorn.comm.util.LogErrorMessage;
 import net.younguard.bighorn.domain.AccountBaseInfo;
 import net.younguard.bighorn.domain.GameMasterInfo;
 import net.younguard.bighorn.domain.GameMemberMasterInfo;
+import net.younguard.bighorn.domain.MyGameMasterInfo;
 
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
@@ -54,7 +57,9 @@ public class MyHistoryQueryPaginationAdapter
 		try {
 			GameService gameService = BighornApplicationContextUtil.getGameService();
 			AccountService accountService = BighornApplicationContextUtil.getAccountService();
+			BadgeNumService badgeNumService = BighornApplicationContextUtil.getBadgeNumService();
 
+			List<MyGameMasterInfo> myGames = new ArrayList<MyGameMasterInfo>();
 			List<GameMasterInfo> games = gameService.queryHistoryPagination(pageNum, pageSize, accountId);
 			for (GameMasterInfo game : games) {
 				List<GameMemberMasterInfo> players = gameService.queryGameMembers(game.getGameId());
@@ -65,13 +70,25 @@ public class MyHistoryQueryPaginationAdapter
 					player.setAvatarUrl(account.getAvatarUrl());
 				}
 
-				game.setPlayers(players);
+				MyGameMasterInfo myGame = new MyGameMasterInfo();
+				myGame.setGameId(game.getGameId());
+				myGame.setPlayers(players);
+				myGame.setCreateTime(game.getCreateTime());
+				myGame.setLastStep(game.getLastStep());
+				myGame.setState(game.getState());
+				myGame.setTimeRule(game.getTimeRule());
+				myGame.setWinnerId(game.getWinnerId());
+				myGame.setLastUpdateTime(game.getLastUpdateTime());
+				short badgeNum = badgeNumService.queryHistoryNum(accountId);
+				myGame.setBadgeNum(badgeNum);
+
+				myGames.add(myGame);
 			}
 			logger.info("commandTag=[" + this.getTag() + "]|ErrorCode=[" + ErrorCode.SUCCESS + "]|sessionId=["
 					+ session.getId() + "]|device=[" + deviceId + "]|");
 
 			MyHistoryQueryPaginationResp respCmd = new MyHistoryQueryPaginationResp(this.getSequence(),
-					ErrorCode.SUCCESS, games);
+					ErrorCode.SUCCESS, myGames);
 			return respCmd;
 		} catch (Exception e) {
 			logger.warn("commandTag=[" + this.getTag() + "]|ErrorCode=[" + ErrorCode.UNKNOWN_FAILURE + "]|sessionId=["

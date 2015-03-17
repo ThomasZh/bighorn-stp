@@ -6,6 +6,7 @@ import java.util.Map;
 import net.younguard.bighorn.CommandTag;
 import net.younguard.bighorn.ErrorCode;
 import net.younguard.bighorn.GlobalArgs;
+import net.younguard.bighorn.badgenum.BadgeNumService;
 import net.younguard.bighorn.broadcast.domain.SessionAccountObject;
 import net.younguard.bighorn.broadcast.domain.SessionDeviceObject;
 import net.younguard.bighorn.broadcast.service.GameService;
@@ -62,6 +63,7 @@ public class GameResignAdapter
 			GameService gameService = BighornApplicationContextUtil.getGameService();
 			SessionService sessionService = BighornApplicationContextUtil.getSessionService();
 			PlayerService playerService = BighornApplicationContextUtil.getPlayerService();
+			BadgeNumService badgeNumService = BighornApplicationContextUtil.getBadgeNumService();
 
 			gameService.modifyGameState(gameId, GlobalArgs.GAME_STATE_COMPLETE, timestamp);
 			String opponentId = gameService.queryOpponentId(gameId, accountId);
@@ -86,6 +88,9 @@ public class GameResignAdapter
 
 			num = playerService.queryCompletedNum(opponentId);
 			playerService.modifyCompletedNum(opponentId, ++num);
+			
+			short badgeNum = badgeNumService.queryHistoryNum(opponentId);
+			badgeNumService.modifyHistoryNum(opponentId, ++badgeNum);
 
 			// Logic: send message to opponent
 			SessionAccountObject opponentSao = sessionService.getAccount(opponentId);
