@@ -1,6 +1,7 @@
 package net.younguard.bighorn.broadcast.adapter.session;
 
 import java.io.UnsupportedEncodingException;
+import java.util.UUID;
 
 import net.younguard.bighorn.CommandTag;
 import net.younguard.bighorn.ErrorCode;
@@ -65,16 +66,18 @@ public class AccountInfoModifyAdapter
 					logger.info("commandTag=[" + this.getTag() + "]|create an new account|sessionId=["
 							+ session.getId() + "]|device=[" + deviceId + "]|nickname=[" + nickname + "]");
 
-					accountId = accountService.create(nickname, avatarUrl, timestamp);
-					playerService.add(accountId);	// add into summary table 
+					accountId = UUID.randomUUID().toString();
+					accountService.create(accountId, nickname, avatarUrl, timestamp);
+					playerService.add(accountId); // add into summary table
 				}
 			} else { // create
 				logger.info("commandTag=[" + this.getTag() + "]|create an new account|sessionId=[" + session.getId()
 						+ "]|device=[" + deviceId + "]|nickname=[" + nickname + "]");
 
-				accountId = accountService.create(nickname, avatarUrl, timestamp);
+				accountId = UUID.randomUUID().toString();
+				accountService.create(accountId, nickname, avatarUrl, timestamp);
 			}
-			
+
 			deviceService.bind(deviceId, accountId, timestamp);
 
 			AccountInfoModifyResp respCmd = new AccountInfoModifyResp(this.getSequence(), ErrorCode.SUCCESS, accountId);

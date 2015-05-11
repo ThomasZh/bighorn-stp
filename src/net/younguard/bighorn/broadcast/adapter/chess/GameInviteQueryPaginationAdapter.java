@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.younguard.bighorn.CommandTag;
 import net.younguard.bighorn.ErrorCode;
+import net.younguard.bighorn.broadcast.domain.Page;
 import net.younguard.bighorn.broadcast.service.AccountService;
 import net.younguard.bighorn.broadcast.service.GameService;
 import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
@@ -54,7 +55,8 @@ public class GameInviteQueryPaginationAdapter
 			GameService gameService = BighornApplicationContextUtil.getGameService();
 			AccountService accountService = BighornApplicationContextUtil.getAccountService();
 
-			List<GameMasterInfo> games = gameService.queryInvitePagination(pageNum, pageSize);
+			Page<GameMasterInfo> page = gameService.queryInvitePagination(pageNum, pageSize);
+			List<GameMasterInfo> games = page.getPageItems();
 			for (GameMasterInfo game : games) {
 				List<GameMemberMasterInfo> players = gameService.queryGameMembers(game.getGameId());
 

@@ -2,6 +2,7 @@ package net.younguard.bighorn.broadcast.service;
 
 import java.util.List;
 
+import net.younguard.bighorn.broadcast.domain.Page;
 import net.younguard.bighorn.domain.GameMasterInfo;
 import net.younguard.bighorn.domain.GameMemberMasterInfo;
 import net.younguard.bighorn.domain.GameStep;
@@ -19,7 +20,7 @@ public interface GameService
 
 	public void modifyGameWinner(String gameId, String winnerId, int timestamp);
 
-	public List<GameMasterInfo> queryInvitePagination(short pageNum, short pageSize);
+	public Page<GameMasterInfo> queryInvitePagination(short pageNum, short pageSize);
 
 	public List<GameMasterInfo> queryPlayingPagination(short pageNum, short pageSize);
 

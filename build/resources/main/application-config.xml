@@ -11,6 +11,9 @@
 	<bean id="broadcastAccountDao" class="net.younguard.bighorn.broadcast.dao.spring.AccountDaoImpl">
 		<property name="jdbcTemplate" ref="bighornJdbcTemplate" />
 	</bean>
+	<bean id="broadcastAccountLoginDao" class="net.younguard.bighorn.broadcast.dao.spring.AccountLoginDaoImpl">
+		<property name="jdbcTemplate" ref="bighornJdbcTemplate" />
+	</bean>
 	<bean id="broadcastDeviceDao" class="net.younguard.bighorn.broadcast.dao.spring.DeviceDaoImpl">
 		<property name="jdbcTemplate" ref="bighornJdbcTemplate" />
 	</bean>
@@ -29,12 +32,16 @@
 	<bean id="broadcastPlayerDao" class="net.younguard.bighorn.broadcast.dao.spring.PlayerDaoImpl">
 		<property name="jdbcTemplate" ref="bighornJdbcTemplate" />
 	</bean>
+	<bean id="broadcastBadgeNumDao" class="net.younguard.bighorn.badgenum.dao.spring.BadgeNumDaoImpl">
+		<property name="jdbcTemplate" ref="bighornJdbcTemplate" />
+	</bean>
 	<!-- end of Dao beans -->
 
 
 	<!-- start of service beans -->
 	<bean id="broadcastAccountService" class="net.younguard.bighorn.broadcast.service.AccountServiceImpl">
 		<property name="accountDao" ref="broadcastAccountDao" />
+		<property name="accountLoginDao" ref="broadcastAccountLoginDao" />
 	</bean>
 	<bean id="broadcastDeviceService" class="net.younguard.bighorn.broadcast.service.DeviceServiceImpl">
 		<property name="deviceDao" ref="broadcastDeviceDao" />
@@ -49,6 +56,9 @@
 		<property name="playerDao" ref="broadcastPlayerDao" />
 	</bean>
 	<bean id="broadcastSessionService" class="net.younguard.bighorn.broadcast.service.SessionServiceHashMapImpl">
+	</bean>
+	<bean id="broadcastBadgeNumService" class="net.younguard.bighorn.badgenum.BadgeNumServiceImpl">
+		<property name="playerDao" ref="broadcastPlayerDao" />
 	</bean>
 	<!-- end of service beans -->
 

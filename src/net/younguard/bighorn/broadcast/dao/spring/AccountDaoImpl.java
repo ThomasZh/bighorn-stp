@@ -21,8 +21,8 @@ public class AccountDaoImpl
 	@Override
 	public boolean isExist(String accountId)
 	{
-		String sql = "SELECT count(account_id) FROM bighorn_account WHERE account_id=?";
-		logger.debug("SELECT count(account_id) FROM bighorn_account WHERE account_id=" + accountId);
+		String sql = "SELECT count(account_id) FROM bighorn_account_base WHERE account_id=?";
+		logger.debug("SELECT count(account_id) FROM bighorn_account_base WHERE account_id=" + accountId);
 
 		int count = this.getJdbcTemplate().queryForInt(sql, accountId);
 		return count > 0 ? true : false;
@@ -31,8 +31,8 @@ public class AccountDaoImpl
 	@Override
 	public void add(final String accountId, final String nickname, final String avatarUrl, final int timestamp)
 	{
-		String sql = "INSERT INTO bighorn_account (account_id,nickname,avatar_url,state,create_time,last_update_time) VALUES (?,?,?,?,?,?)";
-		logger.debug("INSERT INTO bighorn_account (account_id,nickname,avatar_url,state,create_time,last_update_time) VALUES ("
+		String sql = "INSERT INTO bighorn_account_base (account_id,nickname,avatar_url,state,create_time,last_update_time) VALUES (?,?,?,?,?,?)";
+		logger.debug("INSERT INTO bighorn_account_base (account_id,nickname,avatar_url,state,create_time,last_update_time) VALUES ("
 				+ accountId
 				+ ","
 				+ nickname
@@ -62,8 +62,8 @@ public class AccountDaoImpl
 	@Override
 	public void update(final String accountId, final String nickname, final String avatarUrl, final int timestamp)
 	{
-		String sql = "UPDATE bighorn_account SET nickname=?,avatar_url=?,last_update_time=? WHERE account_id=?";
-		logger.debug("UPDATE bighorn_account SET nickname=" + nickname + ",avatar_url=" + avatarUrl
+		String sql = "UPDATE bighorn_account_base SET nickname=?,avatar_url=?,last_update_time=? WHERE account_id=?";
+		logger.debug("UPDATE bighorn_account_base SET nickname=" + nickname + ",avatar_url=" + avatarUrl
 				+ ",last_update_time=" + timestamp + " WHERE account_id=" + accountId);
 
 		this.getJdbcTemplate().update(sql, new PreparedStatementSetter()
@@ -85,8 +85,8 @@ public class AccountDaoImpl
 	{
 		final AccountBaseInfo data = new AccountBaseInfo();
 
-		String sql = "SELECT nickname,avatar_url FROM bighorn_account WHERE account_id=?";
-		logger.debug("SELECT nickname,avatar_url FROM bighorn_account WHERE account_id=" + accountId);
+		String sql = "SELECT nickname,avatar_url FROM bighorn_account_base WHERE account_id=?";
+		logger.debug("SELECT nickname,avatar_url FROM bighorn_account_base WHERE account_id=" + accountId);
 
 		this.getJdbcTemplate().query(sql, new PreparedStatementSetter()
 		{
@@ -113,8 +113,8 @@ public class AccountDaoImpl
 	@Override
 	public void delete(final String accountId)
 	{
-		String sql = "DELETE FROM bighorn_account WHERE account_id=?";
-		logger.debug("DELETE FROM bighorn_account WHERE account_id=" + accountId);
+		String sql = "DELETE FROM bighorn_account_base WHERE account_id=?";
+		logger.debug("DELETE FROM bighorn_account_base WHERE account_id=" + accountId);
 
 		this.getJdbcTemplate().update(sql, new PreparedStatementSetter()
 		{

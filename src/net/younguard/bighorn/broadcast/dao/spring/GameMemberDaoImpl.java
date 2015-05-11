@@ -77,7 +77,7 @@ public class GameMemberDaoImpl
 				int n = 1;
 				data.setAccountId(rs.getString(n++));
 				data.setState(rs.getShort(n++));
-				data.setState(rs.getShort(n++));
+				data.setColor(rs.getShort(n++));
 
 				array.add(data);
 			}

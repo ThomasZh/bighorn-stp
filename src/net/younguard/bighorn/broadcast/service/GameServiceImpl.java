@@ -47,12 +47,9 @@ public class GameServiceImpl
 	}
 
 	@Override
-	public List<GameMasterInfo> queryInvitePagination(short pageNum, short pageSize)
+	public Page<GameMasterInfo> queryInvitePagination(short pageNum, short pageSize)
 	{
-		Page<GameMasterInfo> games = gameDao.queryGamePagination(pageNum, pageSize, GlobalArgs.GAME_STATE_INVITE);
-		List<GameMasterInfo> array = games.getPageItems();
-
-		return array;
+		return gameDao.queryGamePagination(pageNum, pageSize, GlobalArgs.GAME_STATE_INVITE);
 	}
 
 	@Override
@@ -118,7 +115,7 @@ public class GameServiceImpl
 
 	public List<GameMemberMasterInfo> queryGameMembers(String gameId)
 	{
-		return null;
+		return gameMemberDao.select(gameId);
 	}
 
 	@Override
