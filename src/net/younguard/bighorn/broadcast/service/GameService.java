@@ -22,7 +22,7 @@ public interface GameService
 
 	public Page<GameMasterInfo> queryInvitePagination(short pageNum, short pageSize);
 
-	public List<GameMasterInfo> queryPlayingPagination(short pageNum, short pageSize);
+	public Page<GameMasterInfo> queryPlayingPagination(short pageNum, short pageSize);
 
 	public List<GameMasterInfo> queryHistoryPagination(short pageNum, short pageSize);
 
@@ -43,8 +43,12 @@ public interface GameService
 
 	public String queryOpponentId(String gameId, String accountId);
 
+	public short queryColor(String gameId, String accountId);
+
 	// /////////////////////////////////////////////////////////
 	// manual
+
+	public short queryLastStep(String gameId);
 
 	public List<GameStep> queryGameManual(String gameId);
 

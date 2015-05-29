@@ -7,10 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.younguard.bighorn.broadcast.dao.GameManualDao;
+import net.younguard.bighorn.comm.util.LogErrorMessage;
 import net.younguard.bighorn.domain.GameStep;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
@@ -23,8 +26,8 @@ public class GameManualDaoImpl
 	public void add(final String gameId, final String accountId, final short step, final short color, final short x,
 			final short y, final int timestamp)
 	{
-		String sql = "INSERT INTO bighorn_game_manual (game_id,account_id,step,color,x,y,timestamp) VALUES (?,?,?,?,?,?,?)";
-		logger.debug("INSERT INTO bighorn_game_manual (game_id,account_id,step,color,x,y,timestamp) VALUES (" + gameId
+		String sql = "INSERT INTO bighorn_game_manual (game_id,account_id,step,color,x,y,create_time) VALUES (?,?,?,?,?,?,?)";
+		logger.debug("INSERT INTO bighorn_game_manual (game_id,account_id,step,color,x,y,create_time) VALUES (" + gameId
 				+ "," + accountId + "," + step + "," + color + "," + x + "," + y + "," + timestamp + ")");
 
 		this.getJdbcTemplate().update(sql, new PreparedStatementSetter()
@@ -42,6 +45,26 @@ public class GameManualDaoImpl
 				ps.setInt(i++, timestamp);
 			}
 		});
+	}
+
+	@Override
+	public short selectLastStep(String gameId)
+	{
+		int count = 0;
+
+		try {
+			String sql = "SELECT max(step) FROM bighorn_game_manual WHERE game_id=?";
+			logger.debug("SELECT max(step) FROM bighorn_game_manual WHERE game_id=" + gameId);
+
+			Object[] params = new Object[] { gameId };
+			count = this.getJdbcTemplate().queryForInt(sql, params);
+		} catch (EmptyResultDataAccessException ee) {
+		} catch (IncorrectResultSizeDataAccessException ie) {
+			logger.warn("SELECT max(step) FROM bighorn_game_manual WHERE game_id=" + gameId);
+			logger.warn(LogErrorMessage.getFullInfo(ie));
+		}
+
+		return (short) count;
 	}
 
 	@Override

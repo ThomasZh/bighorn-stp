@@ -7,6 +7,8 @@ import net.younguard.bighorn.domain.GameStep;
 public interface GameManualDao
 {
 	public List<GameStep> select(String gameId, short lastStep);
+	
+	public short selectLastStep(String gameId);
 
 	public void add(String gameId, String accountId, short step, short color, short x, short y, int timestamp);
 }

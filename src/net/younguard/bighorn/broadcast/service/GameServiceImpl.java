@@ -63,12 +63,9 @@ public class GameServiceImpl
 	}
 
 	@Override
-	public List<GameMasterInfo> queryPlayingPagination(short pageNum, short pageSize)
+	public Page<GameMasterInfo> queryPlayingPagination(short pageNum, short pageSize)
 	{
-		Page<GameMasterInfo> games = gameDao.queryGamePagination(pageNum, pageSize, GlobalArgs.GAME_STATE_PLAYING);
-		List<GameMasterInfo> array = games.getPageItems();
-
-		return array;
+		return gameDao.queryGamePagination(pageNum, pageSize, GlobalArgs.GAME_STATE_PLAYING);
 	}
 
 	@Override
@@ -132,8 +129,28 @@ public class GameServiceImpl
 		return null;
 	}
 
+	@Override
+	public short queryColor(String gameId, String accountId)
+	{
+		List<GameMemberMasterInfo> array = gameMemberDao.select(gameId);
+		for (GameMemberMasterInfo player : array) {
+			if (accountId.equals(player.getAccountId())) {
+				return player.getColor();
+			}
+		}
+
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 	// /////////////////////////////////////////////////////////
 	// manual
+
+	@Override
+	public short queryLastStep(String gameId)
+	{
+		return gameManualDao.selectLastStep(gameId);
+	}
 
 	@Override
 	public List<GameStep> queryGameManual(String gameId)
