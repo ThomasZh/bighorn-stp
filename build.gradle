@@ -6,7 +6,7 @@ loadConfiguration()
 def loadConfiguration() {
     def environment = hasProperty('env') ? env : 'dev'
     project.ext.set("environment", environment)
-    project.ext.set("distVersion", "0.6.2")//distribution version number
+    project.ext.set("distVersion", "0.6.3")//distribution version number
 }
 
 //----------------------------------
@@ -63,7 +63,7 @@ dependencies {
     
     compile 'cn.jpush.api:jpush-client:3.2.3'
     compile 'com.mchange:c3p0:0.9.5-pre8'    
-    compile 'org.xerial:sqlite-jdbc:3.7.2'
+    compile 'mysql:mysql-connector-java:5.1.33'
     
     compile 'org.springframework:spring-context:4.1.4.RELEASE'
     compile 'org.springframework:spring-jdbc:4.1.4.RELEASE'

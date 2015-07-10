@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
-import net.younguard.bighorn.broadcast.util.PropArgs;
+import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
+import net.younguard.bighorn.broadcast.util.GlobalConfigurationVariables;
 import net.younguard.bighorn.comm.codec.TlvPackageCodecFactory;
 
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
@@ -16,6 +17,8 @@ import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class UdpServerDemo
 {
@@ -24,13 +27,28 @@ public class UdpServerDemo
 	{
 		logger.info("stp server is starting...");
 
-		startMinaServer(PropArgs.STP_PORT);
-		logger.info("stp Server is listenig at port: " + PropArgs.STP_PORT);
+		initSpringApp();
+		
+		GlobalConfigurationVariables gcv = BighornApplicationContextUtil.getGlobalConfigurationVariables();
+		
+		startMinaServer(gcv.getStpPort());
+		logger.info("stp Server is listenig at port: " + gcv.getStpPort());
 	}
 
+	private static void initSpringApp()
+	{
+		String springXmlFile = "classpath:application-config.xml";
+		ApplicationContext applicationContext = new ClassPathXmlApplicationContext(springXmlFile);
+		BighornApplicationContextUtil.setApplicationContext(applicationContext);
+
+		logger.info("init ApplicationContext");
+	}
+	
 	private static void startMinaServer(int port)
 			throws IOException
 	{
+		GlobalConfigurationVariables gcv = BighornApplicationContextUtil.getGlobalConfigurationVariables();
+		
 		NioDatagramAcceptor acceptor = new NioDatagramAcceptor();
 		acceptor.setHandler(new UdpServerEventHandler());
 
@@ -43,7 +61,7 @@ public class UdpServerDemo
 		filterChainBuilder.addLast("codec", new ProtocolCodecFilter(new TlvPackageCodecFactory()));
 
 		// setup read buffer size
-		acceptor.getSessionConfig().setReadBufferSize(PropArgs.BUFFER_SIZE); // 64k
+		acceptor.getSessionConfig().setReadBufferSize(gcv.getBufferSize()); // 64k
 		// 10 seconds idle, and remove eventHandler in sessionIdle
 		acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
 

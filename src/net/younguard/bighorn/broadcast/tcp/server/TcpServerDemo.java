@@ -9,7 +9,7 @@ import net.younguard.bighorn.broadcast.domain.DeviceDetailInfo;
 import net.younguard.bighorn.broadcast.service.DeviceService;
 import net.younguard.bighorn.broadcast.service.SessionService;
 import net.younguard.bighorn.broadcast.util.BighornApplicationContextUtil;
-import net.younguard.bighorn.broadcast.util.PropArgs;
+import net.younguard.bighorn.broadcast.util.GlobalConfigurationVariables;
 import net.younguard.bighorn.comm.codec.TlvPackageCodecFactory;
 
 import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
@@ -45,8 +45,10 @@ public class TcpServerDemo
 
 		initSessionCache();
 
-		startMinaServer(PropArgs.STP_PORT);
-		logger.info("stp server is listenig at port: " + PropArgs.STP_PORT);
+		GlobalConfigurationVariables gcv = BighornApplicationContextUtil.getGlobalConfigurationVariables();
+
+		startMinaServer(gcv.getStpPort());
+		logger.info("stp server is listenig at port: " + gcv.getStpPort());
 
 		logger.info("stp server start success!");
 	}
@@ -77,12 +79,14 @@ public class TcpServerDemo
 	private static void startMinaServer(int port)
 			throws IOException
 	{
+		GlobalConfigurationVariables gcv = BighornApplicationContextUtil.getGlobalConfigurationVariables();
+		
 		IoAcceptor acceptor = new NioSocketAcceptor();
 
 		// filter (user define protocol tlv)
 		acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TlvPackageCodecFactory()));
 		// setup read buffer size
-		acceptor.getSessionConfig().setReadBufferSize(PropArgs.BUFFER_SIZE); // 64k
+		acceptor.getSessionConfig().setReadBufferSize(gcv.getBufferSize()); // 64k
 		// 8 minutes idle, and remove eventHandler in sessionIdle
 		acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 480);
 

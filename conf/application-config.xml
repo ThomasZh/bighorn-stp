@@ -5,6 +5,7 @@
 
 	<!-- datasource config -->
 	<import resource="jdbc-context.xml" />
+	<import resource="gcv-context.xml" />
 
 
 	<!-- start of Dao beans -->
@@ -58,7 +59,7 @@
 	<bean id="broadcastSessionService" class="net.younguard.bighorn.broadcast.service.SessionServiceHashMapImpl">
 	</bean>
 	<bean id="broadcastBadgeNumService" class="net.younguard.bighorn.badgenum.BadgeNumServiceImpl">
-		<property name="playerDao" ref="broadcastPlayerDao" />
+		<property name="badgeNumDao" ref="broadcastBadgeNumDao" />
 	</bean>
 	<!-- end of service beans -->
 

@@ -54,4 +54,9 @@ public class BighornApplicationContextUtil
 	{
 		return (BadgeNumService) context.getBean("broadcastBadgeNumService");
 	}
+
+	public static GlobalConfigurationVariables getGlobalConfigurationVariables()
+	{
+		return (GlobalConfigurationVariables) context.getBean("globalConfigurationVariables");
+	}
 }
